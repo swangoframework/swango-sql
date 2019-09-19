@@ -1,5 +1,5 @@
 {
-	"name" : "swangoframwork/swango-sql",
+	"name" : "swango/sql",
 	"license" : "Apache-2.0",
 	"keywords" : [
 		"php",
