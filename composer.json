@@ -1,0 +1,23 @@
+{
+	"name" : "swangoframwork/swango-sql",
+	"license" : "Apache-2.0",
+	"keywords" : [
+		"php",
+		"swoole",
+		"sql"
+	],
+	"require" : {
+		"php" : ">=7.1",
+		"swlib/http" : "1.0.3",
+		"zendframework/zend-stdlib" : "^2.7 || ^3.0"
+	},
+	"autoload" : {
+		"psr-4" : {
+			"Sql\\" : "src"
+		}
+	},
+	"config" : {
+		"optimize-autoloader" : true,
+		"sort-packages" : true
+	}
+}
