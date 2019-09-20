@@ -99,7 +99,7 @@ class Delete extends AbstractSql {
      *
      * @return self Provides a fluent interface
      */
-    public function where($predicate, $combination = Predicate\PredicateSet::OP_AND): string {
+    public function where($predicate, $combination = Predicate\PredicateSet::OP_AND): self {
         if ($predicate instanceof Where) {
             $this->where = $predicate;
         } else {

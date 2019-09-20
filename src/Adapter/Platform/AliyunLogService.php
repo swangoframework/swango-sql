@@ -65,7 +65,7 @@ class AliyunLogService extends AbstractPlatform {
      * {@inheritdoc}
      *
      */
-    public function quoteValue(string $value): string {
+    public function quoteValue($value): string {
         if (is_string($value))
             return '\'' . addcslashes((string)$value, "\x00\n\r\\'\"\x1a") . '\'';
         if (is_bool($value))
@@ -78,7 +78,7 @@ class AliyunLogService extends AbstractPlatform {
      * {@inheritdoc}
      *
      */
-    public function quoteTrustedValue(string $value): string {
+    public function quoteTrustedValue($value): string {
         return $this->quoteValue($value);
     }
     public function shoueldQuoteOtherTable(): bool {

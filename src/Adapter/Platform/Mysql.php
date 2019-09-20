@@ -84,7 +84,7 @@ class Mysql extends AbstractPlatform {
      * {@inheritdoc}
      *
      */
-    public function quoteValue(string $value): string {
+    public function quoteValue($value): string {
         if ($this->resource instanceof \Swoole\Coroutine\MySQL) {
             return '\'' . $this->resource->escape($value) . '\'';
         }
@@ -102,7 +102,7 @@ class Mysql extends AbstractPlatform {
      * {@inheritdoc}
      *
      */
-    public function quoteTrustedValue(string $value): string {
+    public function quoteTrustedValue($value): string {
         if ($this->resource instanceof \Swoole\Coroutine\MySQL) {
             return '\'' . $this->resource->escape($value) . '\'';
         }

@@ -47,7 +47,7 @@ class Join implements Iterator, Countable {
     /**
      * Rewind iterator.
      */
-    public function rewind() {
+    public function rewind(): void {
         $this->position = 0;
     }
 
@@ -56,7 +56,7 @@ class Join implements Iterator, Countable {
      *
      * @return array
      */
-    public function current() {
+    public function current(): array {
         return $this->joins[$this->position];
     }
 
@@ -65,14 +65,14 @@ class Join implements Iterator, Countable {
      *
      * @return int
      */
-    public function key() {
+    public function key(): int {
         return $this->position;
     }
 
     /**
      * Advance to the next JOIN specification.
      */
-    public function next() {
+    public function next(): void {
         ++ $this->position;
     }
 
@@ -81,7 +81,7 @@ class Join implements Iterator, Countable {
      *
      * @return bool
      */
-    public function valid() {
+    public function valid(): bool {
         return isset($this->joins[$this->position]);
     }
 

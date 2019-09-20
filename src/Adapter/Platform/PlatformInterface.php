@@ -46,7 +46,7 @@ interface PlatformInterface {
      * @param string $value
      * @return string
      */
-    public function quoteValue(string $value): string;
+    public function quoteValue($value): string;
 
     /**
      * Quote Trusted Value
@@ -57,7 +57,7 @@ interface PlatformInterface {
      *            $value
      * @return string
      */
-    public function quoteTrustedValue(string $value): string;
+    public function quoteTrustedValue($value): string;
 
     /**
      * Quote value list

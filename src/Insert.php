@@ -118,7 +118,7 @@ class Insert extends AbstractSql {
      * @param array $array
      * @return bool
      */
-    private function isAssocativeArray(array $array) {
+    private function isAssocativeArray(array $array): bool {
         return array_keys($array) !== range(0, count($array) - 1);
     }
 
