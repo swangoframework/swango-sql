@@ -420,7 +420,6 @@ class Select extends AbstractSql {
     }
 
     /**
-     * add by fdream, 2019-06-06
      *
      * @param string $index
      * @return self Provides a fluent interface
