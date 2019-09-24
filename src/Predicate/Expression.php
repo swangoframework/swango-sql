@@ -18,9 +18,7 @@ class Expression extends BaseExpression implements PredicateInterface {
         if (! empty($valueParameter)) {
             $valueParameter1 = current($valueParameter);
             $valueParameterArray = is_array($valueParameter1) ? $valueParameter1 : $valueParameter;
-        } else
-            $valueParameterArray = null;
-
-        $this->setParameters($valueParameterArray);
+            $this->setParameters($valueParameterArray);
+        }
     }
 }
