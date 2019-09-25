@@ -1,6 +1,7 @@
 <?php
 namespace Sql;
 use Sql\Adapter\Platform\PlatformInterface;
+use function Swlib\Http\stream_for;
 
 class InsertMulti extends AbstractSql implements \countable {
     const SPECIFICATION_INSERT = 'insert';
@@ -106,8 +107,7 @@ class InsertMulti extends AbstractSql implements \countable {
         for($i = 0; $i < $columns_count; ++ $i)
             $columns[] = $platform->quoteIdentifier($this->columns[$i]);
 
-        $ret = new \Swlib\Http\Stream();
-        $ret->write('INSERT INTO ');
+        $ret = stream_for('INSERT INTO ');
         $ret->write($platform->shoueldQuoteOtherTable() ? $this->resolveTable($this->table, $platform) : $this->table);
         $ret->write(' (' . implode(', ', $columns) . ') VALUES ');
 
