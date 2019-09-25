@@ -106,7 +106,7 @@ class InsertMulti extends AbstractSql implements \countable {
         for($i = 0; $i < $columns_count; ++ $i)
             $columns[] = $platform->quoteIdentifier($this->columns[$i]);
 
-        $ret = new \Swlib\Http\PHPMemory();
+        $ret = new \Swlib\Http\Stream();
         $ret->write('INSERT INTO ');
         $ret->write($platform->shoueldQuoteOtherTable() ? $this->resolveTable($this->table, $platform) : $this->table);
         $ret->write(' (' . implode(', ', $columns) . ') VALUES ');
