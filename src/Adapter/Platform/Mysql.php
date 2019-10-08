@@ -35,7 +35,7 @@ class Mysql extends AbstractPlatform {
 
     /**
      *
-     * @param null|\Swoole\Coroutine\MySQL|\Sql\Adapter\Driver\Mysqli\Mysqli|\Sql\Adapter\Driver\Pdo\Pdo|\mysqli|\PDO $driver
+     * @param \Swoole\Coroutine\MySQL|\mysqli|\PDO $driver
      */
     public function __construct($driver = null) {
         if ($driver) {
@@ -45,13 +45,13 @@ class Mysql extends AbstractPlatform {
 
     /**
      *
-     * @param \Swoole\Coroutine\MySQL|\Sql\Adapter\Driver\Mysqli\Mysqli|\Sql\Adapter\Driver\Pdo\Pdo|\mysqli|\PDO $driver
+     * @param \Swoole\Coroutine\MySQL|\mysqli|\PDO $driver
      * @return self Provides a fluent interface
      * @throws \Sql\Adapter\Exception\InvalidArgumentException
      */
     public function setDriver($driver): self {
         // handle Mysql drivers
-        if ($driver instanceof \Swoole\Coroutine\MySQL || ($driver instanceof \mysqli) ||
+        if (method_exists($driver, 'escape') || ($driver instanceof \mysqli) ||
              ($driver instanceof \PDO && $driver->getAttribute(\PDO::ATTR_DRIVER_NAME) == 'mysql')) {
             $this->resource = $driver;
             return $this;
@@ -85,7 +85,7 @@ class Mysql extends AbstractPlatform {
      *
      */
     public function quoteValue($value): string {
-        if ($this->resource instanceof \Swoole\Coroutine\MySQL) {
+        if (method_exists($this->resource, 'escape')) {
             return '\'' . $this->resource->escape($value) . '\'';
         }
         if ($this->resource instanceof \mysqli) {
@@ -103,7 +103,7 @@ class Mysql extends AbstractPlatform {
      *
      */
     public function quoteTrustedValue($value): string {
-        if ($this->resource instanceof \Swoole\Coroutine\MySQL) {
+        if (method_exists($this->resource, 'escape')) {
             return '\'' . $this->resource->escape($value) . '\'';
         }
         if ($this->resource instanceof \mysqli) {
