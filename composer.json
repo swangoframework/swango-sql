@@ -8,8 +8,7 @@
 	],
 	"require" : {
 		"php" : ">=7.1",
-		"swlib/http" : "^1.0.5",
-		"zendframework/zend-stdlib" : "^2.7 || ^3.0"
+		"swlib/http" : "^1.0.5"
 	},
 	"autoload" : {
 		"psr-4" : {

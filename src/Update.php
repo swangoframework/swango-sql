@@ -1,7 +1,6 @@
 <?php
 namespace Sql;
 use Sql\Adapter\Platform\PlatformInterface;
-use Zend\Stdlib\PriorityList;
 
 /**
  *
@@ -198,7 +197,6 @@ class Update extends AbstractSql {
 
     /**
      * Variable overloading
-     *
      * Proxies to "where" only
      *
      * @param string $name
@@ -212,7 +210,6 @@ class Update extends AbstractSql {
 
     /**
      * __clone
-     *
      * Resets the where object each time the Update is cloned.
      *
      * @return void
