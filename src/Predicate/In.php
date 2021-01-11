@@ -9,12 +9,12 @@ class In extends AbstractExpression implements PredicateInterface {
     protected $valueSet;
     protected $specification = '%s IN %s';
     protected $valueSpecSpecification = '%%s IN (%s)';
-    
+
     /**
      * Constructor
      *
-     * @param null|string|array $identifier            
-     * @param null|array|Select $valueSet            
+     * @param null|string|array $identifier
+     * @param null|array|Select $valueSet
      */
     public function __construct($identifier = null, $valueSet = null) {
         if ($identifier) {
@@ -24,19 +24,19 @@ class In extends AbstractExpression implements PredicateInterface {
             $this->setValueSet($valueSet);
         }
     }
-    
+
     /**
      * Set identifier for comparison
      *
-     * @param string|array $identifier            
+     * @param string|array $identifier
      * @return self Provides a fluent interface
      */
     public function setIdentifier($identifier) {
         $this->identifier = $identifier;
-        
+
         return $this;
     }
-    
+
     /**
      * Get identifier of comparison
      *
@@ -45,11 +45,11 @@ class In extends AbstractExpression implements PredicateInterface {
     public function getIdentifier() {
         return $this->identifier;
     }
-    
+
     /**
      * Set set of values for IN comparison
      *
-     * @param array|Select $valueSet            
+     * @param array|Select $valueSet
      * @return self Provides a fluent interface
      * @throws Exception\InvalidArgumentException
      */
@@ -59,10 +59,10 @@ class In extends AbstractExpression implements PredicateInterface {
                 '$valueSet must be either an array or a Sql\Select object, ' . gettype($valueSet) . ' given');
         }
         $this->valueSet = $valueSet;
-        
+
         return $this;
     }
-    
+
     /**
      * Gets set of values in IN comparison
      *
@@ -71,7 +71,7 @@ class In extends AbstractExpression implements PredicateInterface {
     public function getValueSet() {
         return $this->valueSet;
     }
-    
+
     /**
      * Return array of parts for where statement
      *
@@ -81,7 +81,7 @@ class In extends AbstractExpression implements PredicateInterface {
         $identifier = $this->getIdentifier();
         $values = $this->getValueSet();
         $replacements = [];
-        
+
         if (is_array($identifier)) {
             $countIdentifier = count($identifier);
             $identifierSpecFragment = '(' . implode(', ', array_fill(0, $countIdentifier, '%s')) . ')';
@@ -94,13 +94,9 @@ class In extends AbstractExpression implements PredicateInterface {
                 self::TYPE_IDENTIFIER
             ];
         }
-        
+
         if ($values instanceof Select) {
-            $specification = vsprintf($this->specification, 
-                [
-                    $identifierSpecFragment,
-                    '%s'
-                ]);
+            $specification = sprintf($this->specification, $identifierSpecFragment, '%s');
             $replacements[] = $values;
             $types[] = self::TYPE_VALUE;
         } else {
@@ -109,13 +105,9 @@ class In extends AbstractExpression implements PredicateInterface {
             }
             $countValues = count($values);
             $valuePlaceholders = $countValues > 0 ? array_fill(0, $countValues, '%s') : [];
-            $specification = vsprintf($this->specification, 
-                [
-                    $identifierSpecFragment,
-                    '(' . implode(', ', $valuePlaceholders) . ')'
-                ]);
+            $specification = sprintf($this->specification, $identifierSpecFragment, '(' . implode(', ', $valuePlaceholders) . ')');
         }
-        
+
         return [
             [
                 $specification,
