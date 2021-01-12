@@ -192,7 +192,7 @@ abstract class AbstractSql implements SqlInterface {
                         throw new Exception\RuntimeException(sprintf('A number of parameters (%d) was found that is not supported by this specification',
                             $ppCount));
                     }
-                    if (1 === $ppCount) {
+                    if (is_string($multiParamsForPosition)) {
                         $multiParamValues[] = sprintf($paramSpecs[$position][$ppCount], $multiParamsForPosition);
                     } else {
                         $multiParamValues[] = vsprintf($paramSpecs[$position][$ppCount], $multiParamsForPosition);
