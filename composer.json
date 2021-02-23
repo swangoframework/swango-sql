@@ -7,7 +7,7 @@
 		"sql"
 	],
 	"require" : {
-		"php" : ">=7.1",
+		"php" : ">=8.0",
 		"swlib/http" : "^1.0.5"
 	},
 	"autoload" : {
