@@ -1,6 +1,7 @@
 <?php
 namespace Sql\Predicate;
 use Sql\Exception\RuntimeException;
+use Sql\Select;
 
 /**
  *
@@ -12,9 +13,8 @@ use Sql\Exception\RuntimeException;
  * @property Predicate $UNNEST
  */
 class Predicate extends PredicateSet {
-    protected $unnest = null;
-    protected $nextPredicateCombineOperator = null;
-
+    protected ?Predicate $unnest = null;
+    protected ?string $nextPredicateCombineOperator = null;
     /**
      * Begin nesting predicates
      *
@@ -27,7 +27,6 @@ class Predicate extends PredicateSet {
         $this->nextPredicateCombineOperator = null;
         return $predicateSet;
     }
-
     /**
      * Indicate what predicate will be unnested
      *
@@ -37,7 +36,6 @@ class Predicate extends PredicateSet {
     public function setUnnest(Predicate $predicate): void {
         $this->unnest = $predicate;
     }
-
     /**
      * Indicate end of nested predicate
      *
@@ -52,7 +50,6 @@ class Predicate extends PredicateSet {
         $this->unnest = null;
         return $unnest;
     }
-
     /**
      * Create "Equal To" predicate
      *
@@ -66,14 +63,13 @@ class Predicate extends PredicateSet {
      *            TYPE_IDENTIFIER or TYPE_VALUE by default TYPE_VALUE {@see allowedTypes}
      * @return self Provides a fluent interface
      */
-    public function equalTo($left, $right, string $leftType = self::TYPE_IDENTIFIER, string $rightType = self::TYPE_VALUE): self {
+    public function equalTo(int|float|bool|string $left, int|float|bool|string $right, string $leftType = self::TYPE_IDENTIFIER, string $rightType = self::TYPE_VALUE): self {
         $this->addPredicate(new Operator($left, Operator::OPERATOR_EQUAL_TO, $right, $leftType, $rightType),
             $this->nextPredicateCombineOperator ?? $this->defaultCombination);
         $this->nextPredicateCombineOperator = null;
 
         return $this;
     }
-
     /**
      * Create "Not Equal To" predicate
      *
@@ -87,14 +83,13 @@ class Predicate extends PredicateSet {
      *            TYPE_IDENTIFIER or TYPE_VALUE by default TYPE_VALUE {@see allowedTypes}
      * @return self Provides a fluent interface
      */
-    public function notEqualTo($left, $right, string $leftType = self::TYPE_IDENTIFIER, string $rightType = self::TYPE_VALUE): self {
+    public function notEqualTo(int|float|bool|string $left, int|float|bool|string $right, string $leftType = self::TYPE_IDENTIFIER, string $rightType = self::TYPE_VALUE): self {
         $this->addPredicate(new Operator($left, Operator::OPERATOR_NOT_EQUAL_TO, $right, $leftType, $rightType),
             $this->nextPredicateCombineOperator ?? $this->defaultCombination);
         $this->nextPredicateCombineOperator = null;
 
         return $this;
     }
-
     /**
      * Create "Less Than" predicate
      *
@@ -108,14 +103,13 @@ class Predicate extends PredicateSet {
      *            TYPE_IDENTIFIER or TYPE_VALUE by default TYPE_VALUE {@see allowedTypes}
      * @return self Provides a fluent interface
      */
-    public function lessThan($left, $right, string $leftType = self::TYPE_IDENTIFIER, string $rightType = self::TYPE_VALUE): self {
+    public function lessThan(int|float|bool|string $left, int|float|bool|string $right, string $leftType = self::TYPE_IDENTIFIER, string $rightType = self::TYPE_VALUE): self {
         $this->addPredicate(new Operator($left, Operator::OPERATOR_LESS_THAN, $right, $leftType, $rightType),
             $this->nextPredicateCombineOperator ?? $this->defaultCombination);
         $this->nextPredicateCombineOperator = null;
 
         return $this;
     }
-
     /**
      * Create "Greater Than" predicate
      *
@@ -129,14 +123,13 @@ class Predicate extends PredicateSet {
      *            TYPE_IDENTIFIER or TYPE_VALUE by default TYPE_VALUE {@see allowedTypes}
      * @return self Provides a fluent interface
      */
-    public function greaterThan($left, $right, string $leftType = self::TYPE_IDENTIFIER, string $rightType = self::TYPE_VALUE): self {
+    public function greaterThan(int|float|bool|string $left, int|float|bool|string $right, string $leftType = self::TYPE_IDENTIFIER, string $rightType = self::TYPE_VALUE): self {
         $this->addPredicate(new Operator($left, Operator::OPERATOR_GREATER_THAN, $right, $leftType, $rightType),
             $this->nextPredicateCombineOperator ?? $this->defaultCombination);
         $this->nextPredicateCombineOperator = null;
 
         return $this;
     }
-
     /**
      * Create "Less Than Or Equal To" predicate
      *
@@ -150,15 +143,13 @@ class Predicate extends PredicateSet {
      *            TYPE_IDENTIFIER or TYPE_VALUE by default TYPE_VALUE {@see allowedTypes}
      * @return self Provides a fluent interface
      */
-    public function lessThanOrEqualTo($left, $right, string $leftType = self::TYPE_IDENTIFIER, string $rightType = self::TYPE_VALUE): self {
-        $this->addPredicate(
-            new Operator($left, Operator::OPERATOR_LESS_THAN_OR_EQUAL_TO, $right, $leftType, $rightType),
-            $this->nextPredicateCombineOperator ?? $this->defaultCombination);
+    public function lessThanOrEqualTo(int|float|bool|string $left, int|float|bool|string $right, string $leftType = self::TYPE_IDENTIFIER, string $rightType = self::TYPE_VALUE): self {
+        $this->addPredicate(new Operator($left, Operator::OPERATOR_LESS_THAN_OR_EQUAL_TO, $right, $leftType,
+            $rightType), $this->nextPredicateCombineOperator ?? $this->defaultCombination);
         $this->nextPredicateCombineOperator = null;
 
         return $this;
     }
-
     /**
      * Create "Greater Than Or Equal To" predicate
      *
@@ -172,15 +163,13 @@ class Predicate extends PredicateSet {
      *            TYPE_IDENTIFIER or TYPE_VALUE by default TYPE_VALUE {@see allowedTypes}
      * @return self Provides a fluent interface
      */
-    public function greaterThanOrEqualTo($left, $right, string $leftType = self::TYPE_IDENTIFIER, string $rightType = self::TYPE_VALUE): self {
-        $this->addPredicate(
-            new Operator($left, Operator::OPERATOR_GREATER_THAN_OR_EQUAL_TO, $right, $leftType, $rightType),
-            $this->nextPredicateCombineOperator ?? $this->defaultCombination);
+    public function greaterThanOrEqualTo(int|float|bool|string $left, int|float|bool|string $right, string $leftType = self::TYPE_IDENTIFIER, string $rightType = self::TYPE_VALUE): self {
+        $this->addPredicate(new Operator($left, Operator::OPERATOR_GREATER_THAN_OR_EQUAL_TO, $right, $leftType,
+            $rightType), $this->nextPredicateCombineOperator ?? $this->defaultCombination);
         $this->nextPredicateCombineOperator = null;
 
         return $this;
     }
-
     /**
      * Create "Like" predicate
      *
@@ -190,7 +179,7 @@ class Predicate extends PredicateSet {
      * @param string $like
      * @return self Provides a fluent interface
      */
-    public function like($identifier, string $like): self {
+    public function like(string|Expression $identifier, string $like): self {
         $this->addPredicate(new Like($identifier, $like),
             $this->nextPredicateCombineOperator ?? $this->defaultCombination);
         $this->nextPredicateCombineOperator = null;
@@ -206,13 +195,12 @@ class Predicate extends PredicateSet {
      * @param string $notLike
      * @return self Provides a fluent interface
      */
-    public function notLike($identifier, string $notLike): self {
+    public function notLike(string|Expression $identifier, string $notLike): self {
         $this->addPredicate(new NotLike($identifier, $notLike),
             $this->nextPredicateCombineOperator ?? $this->defaultCombination);
         $this->nextPredicateCombineOperator = null;
         return $this;
     }
-
     /**
      * Create an expression, with parameter placeholders
      *
@@ -222,14 +210,13 @@ class Predicate extends PredicateSet {
      *            $parameters
      * @return self Provides a fluent interface
      */
-    public function exists($expression, ...$parameters): self {
+    public function exists(string|Select|Expression $expression, mixed ...$parameters): self {
         $this->addPredicate(new Exists($expression, ...$parameters),
             $this->nextPredicateCombineOperator ?? $this->defaultCombination);
         $this->nextPredicateCombineOperator = null;
 
         return $this;
     }
-
     /**
      * Create an expression, with parameter placeholders
      *
@@ -239,14 +226,13 @@ class Predicate extends PredicateSet {
      *            $parameters
      * @return self Provides a fluent interface
      */
-    public function notExists($expression, ...$parameters): self {
+    public function notExists(string|Select|Expression $expression, mixed ...$parameters): self {
         $this->addPredicate(new NotExists($expression, ...$parameters),
             $this->nextPredicateCombineOperator ?? $this->defaultCombination);
         $this->nextPredicateCombineOperator = null;
 
         return $this;
     }
-
     /**
      * Create an expression, with parameter placeholders
      *
@@ -256,14 +242,13 @@ class Predicate extends PredicateSet {
      *            $parameters
      * @return self Provides a fluent interface
      */
-    public function expression($expression, ...$parameters): self {
+    public function expression(string|Select|Expression $expression, mixed ...$parameters): self {
         $this->addPredicate(new Expression($expression, ...$parameters),
             $this->nextPredicateCombineOperator ?? $this->defaultCombination);
         $this->nextPredicateCombineOperator = null;
 
         return $this;
     }
-
     /**
      * Create "Literal" predicate
      *
@@ -272,24 +257,13 @@ class Predicate extends PredicateSet {
      * @param string $literal
      * @return self Provides a fluent interface
      */
-    public function literal($literal): self {
-        // process deprecated parameters from previous literal($literal, $parameters = null) signature
-        if (func_num_args() >= 2) {
-            $parameters = func_get_arg(1);
-            $predicate = new Expression($literal, $parameters);
-        }
-
-        // normal workflow for "Literals" here
-        if (! isset($predicate)) {
-            $predicate = new Literal($literal);
-        }
-
+    public function literal(string $literal): self {
+        $predicate = new Literal($literal);
         $this->addPredicate($predicate, $this->nextPredicateCombineOperator ?? $this->defaultCombination);
         $this->nextPredicateCombineOperator = null;
 
         return $this;
     }
-
     /**
      * Create "IS NULL" predicate
      *
@@ -298,13 +272,12 @@ class Predicate extends PredicateSet {
      * @param string|Expression $identifier
      * @return self Provides a fluent interface
      */
-    public function isNull($identifier): self {
+    public function isNull(string|Expression $identifier): self {
         $this->addPredicate(new IsNull($identifier), $this->nextPredicateCombineOperator ?? $this->defaultCombination);
         $this->nextPredicateCombineOperator = null;
 
         return $this;
     }
-
     /**
      * Create "IS NOT NULL" predicate
      *
@@ -313,14 +286,13 @@ class Predicate extends PredicateSet {
      * @param string|Expression $identifier
      * @return self Provides a fluent interface
      */
-    public function isNotNull($identifier): self {
+    public function isNotNull(string|Expression $identifier): self {
         $this->addPredicate(new IsNotNull($identifier),
             $this->nextPredicateCombineOperator ?? $this->defaultCombination);
         $this->nextPredicateCombineOperator = null;
 
         return $this;
     }
-
     /**
      * Create "IN" predicate
      *
@@ -330,14 +302,13 @@ class Predicate extends PredicateSet {
      * @param array|\Sql\Select $valueSet
      * @return self Provides a fluent interface
      */
-    public function in($identifier, $valueSet = null): self {
+    public function in(string|Expression $identifier, array|\Sql\Select $valueSet = null): self {
         $this->addPredicate(new In($identifier, $valueSet),
             $this->nextPredicateCombineOperator ?? $this->defaultCombination);
         $this->nextPredicateCombineOperator = null;
 
         return $this;
     }
-
     /**
      * Create "NOT IN" predicate
      *
@@ -347,14 +318,13 @@ class Predicate extends PredicateSet {
      * @param array|\Sql\Select $valueSet
      * @return self Provides a fluent interface
      */
-    public function notIn($identifier, $valueSet = null): self {
+    public function notIn(string|Expression $identifier, array|\Sql\Select $valueSet = null): self {
         $this->addPredicate(new NotIn($identifier, $valueSet),
             $this->nextPredicateCombineOperator ?? $this->defaultCombination);
         $this->nextPredicateCombineOperator = null;
 
         return $this;
     }
-
     /**
      * Create "between" predicate
      *
@@ -365,14 +335,13 @@ class Predicate extends PredicateSet {
      * @param int|float|string $maxValue
      * @return self Provides a fluent interface
      */
-    public function between($identifier, $minValue, $maxValue): self {
+    public function between(string|Expression $identifier, int|float|string $minValue, int|float|string $maxValue): self {
         $this->addPredicate(new Between($identifier, $minValue, $maxValue),
             $this->nextPredicateCombineOperator ?? $this->defaultCombination);
         $this->nextPredicateCombineOperator = null;
 
         return $this;
     }
-
     /**
      * Create "NOT BETWEEN" predicate
      *
@@ -383,14 +352,13 @@ class Predicate extends PredicateSet {
      * @param int|float|string $maxValue
      * @return self Provides a fluent interface
      */
-    public function notBetween($identifier, $minValue, $maxValue): self {
+    public function notBetween(string|Expression $identifier, int|float|string $minValue, int|float|string $maxValue): self {
         $this->addPredicate(new NotBetween($identifier, $minValue, $maxValue),
             $this->nextPredicateCombineOperator ?? $this->defaultCombination);
         $this->nextPredicateCombineOperator = null;
 
         return $this;
     }
-
     /**
      * Use given predicate directly
      *
@@ -407,7 +375,6 @@ class Predicate extends PredicateSet {
 
         return $this;
     }
-
     /**
      * Overloading
      *
@@ -416,7 +383,7 @@ class Predicate extends PredicateSet {
      * @param string $name
      * @return self Provides a fluent interface
      */
-    public function __get($name) {
+    public function __get(string $name) {
         switch (strtolower($name)) {
             case 'or' :
                 $this->nextPredicateCombineOperator = self::OP_OR;

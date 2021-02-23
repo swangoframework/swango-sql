@@ -5,35 +5,31 @@ class Literal implements ExpressionInterface {
      *
      * @var string
      */
-    protected $literal = '';
-    
+    protected string $literal = '';
     /**
      *
      * @param
      *            $literal
      */
-    public function __construct($literal = '') {
+    public function __construct(string $literal = '') {
         $this->literal = $literal;
     }
-    
     /**
      *
-     * @param string $literal            
+     * @param string $literal
      * @return self Provides a fluent interface
      */
-    public function setLiteral($literal) {
+    public function setLiteral(string $literal): self {
         $this->literal = $literal;
         return $this;
     }
-    
     /**
      *
      * @return string
      */
-    public function getLiteral() {
+    public function getLiteral(): string {
         return $this->literal;
     }
-    
     /**
      *
      * @return array

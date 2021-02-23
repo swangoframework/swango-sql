@@ -1,3 +1,4 @@
 <?php
 namespace Sql;
-class Having extends Predicate\Predicate {}
+class Having extends Predicate\Predicate {
+}

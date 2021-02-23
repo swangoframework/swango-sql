@@ -2,4 +2,5 @@
 namespace Sql\Adapter\Exception;
 use Sql\Exception;
 
-interface ExceptionInterface extends Exception\ExceptionInterface {}
+interface ExceptionInterface extends Exception\ExceptionInterface {
+}

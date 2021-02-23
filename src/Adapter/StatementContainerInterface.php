@@ -8,12 +8,11 @@ interface StatementContainerInterface {
      *            $sql
      * @return mixed
      */
-    public function setSql($sql);
-    
+    public function setSql(string $sql);
     /**
      * Get sql
      *
      * @return mixed
      */
-    public function getSql();
+    public function getSql(): string;
 }

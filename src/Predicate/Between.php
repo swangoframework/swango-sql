@@ -3,11 +3,10 @@ namespace Sql\Predicate;
 use Sql\AbstractExpression;
 
 class Between extends AbstractExpression implements PredicateInterface {
-    protected $specification = '%1$s BETWEEN %2$s AND %3$s';
-    protected $identifier = null;
-    protected $minValue = null;
-    protected $maxValue = null;
-
+    protected string $specification = '%1$s BETWEEN %2$s AND %3$s';
+    protected ?string $identifier = null;
+    protected null|int|float|string $minValue = null;
+    protected null|int|float|string $maxValue = null;
     /**
      * Constructor
      *
@@ -15,7 +14,7 @@ class Between extends AbstractExpression implements PredicateInterface {
      * @param int|float|string $minValue
      * @param int|float|string $maxValue
      */
-    public function __construct(?string $identifier = null, $minValue = null, $maxValue = null) {
+    public function __construct(?string $identifier = null, int|float|string $minValue = null, int|float|string $maxValue = null) {
         if ($identifier) {
             $this->setIdentifier($identifier);
         }
@@ -26,7 +25,6 @@ class Between extends AbstractExpression implements PredicateInterface {
             $this->setMaxValue($maxValue);
         }
     }
-
     /**
      * Set identifier for comparison
      *
@@ -37,7 +35,6 @@ class Between extends AbstractExpression implements PredicateInterface {
         $this->identifier = $identifier;
         return $this;
     }
-
     /**
      * Get identifier of comparison
      *
@@ -46,47 +43,42 @@ class Between extends AbstractExpression implements PredicateInterface {
     public function getIdentifier(): ?string {
         return $this->identifier;
     }
-
     /**
      * Set minimum boundary for comparison
      *
      * @param int|float|string $minValue
      * @return self Provides a fluent interface
      */
-    public function setMinValue($minValue) {
+    public function setMinValue(int|float|string $minValue): self {
         $this->minValue = $minValue;
         return $this;
     }
-
     /**
      * Get minimum boundary for comparison
      *
      * @return null|int|float|string
      */
-    public function getMinValue() {
+    public function getMinValue(): null|int|float|string {
         return $this->minValue;
     }
-
     /**
      * Set maximum boundary for comparison
      *
      * @param int|float|string $maxValue
      * @return self Provides a fluent interface
      */
-    public function setMaxValue($maxValue): self {
+    public function setMaxValue(int|float|string $maxValue): self {
         $this->maxValue = $maxValue;
         return $this;
     }
-
     /**
      * Get maximum boundary for comparison
      *
      * @return null|int|float|string
      */
-    public function getMaxValue() {
+    public function getMaxValue(): null|int|float|string {
         return $this->maxValue;
     }
-
     /**
      * Set specification string to use in forming SQL predicate
      *
@@ -97,7 +89,6 @@ class Between extends AbstractExpression implements PredicateInterface {
         $this->specification = $specification;
         return $this;
     }
-
     /**
      * Get specification string to use in forming SQL predicate
      *
@@ -106,7 +97,6 @@ class Between extends AbstractExpression implements PredicateInterface {
     public function getSpecification(): string {
         return $this->specification;
     }
-
     /**
      * Return "where" parts
      *

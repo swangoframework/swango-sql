@@ -8,35 +8,26 @@ abstract class AbstractSql implements SqlInterface {
      *
      * @var string[]|array[]
      */
-    protected $specifications = [];
-    /**
-     *
-     * @var string
-     */
-    protected $processInfo = [
+    protected array $specifications = [];
+    protected array $processInfo = [
         'paramPrefix' => '',
         'subselectCount' => 0
     ];
-    /**
-     *
-     * @var array
-     */
-    protected $instanceParameterIndex = [];
+    protected array $instanceParameterIndex = [];
     /**
      *
      * {@inheritdoc}
      *
      */
-    public function getSqlString(PlatformInterface $adapterPlatform = null) {
-        $adapterPlatform = $adapterPlatform ?? new \Sql\Adapter\Platform\Mysql();
-        return $this->buildSqlString($adapterPlatform);
+    public function getSqlString(PlatformInterface $adapterPlatform = null): string {
+        return $this->buildSqlString($adapterPlatform ?? new \Sql\Adapter\Platform\Mysql());
     }
     /**
      *
      * @param PlatformInterface $platform
      * @return string
      */
-    protected function buildSqlString(PlatformInterface $platform) {
+    protected function buildSqlString(PlatformInterface $platform): string {
         $this->localizeVariables();
 
         $sqls = [];
@@ -66,7 +57,7 @@ abstract class AbstractSql implements SqlInterface {
      * @return string
      * @todo move TableIdentifier concatenation here
      */
-    protected function renderTable($table, $alias = null) {
+    protected function renderTable(string $table, string $alias = null): string {
         return $table . ($alias ? ' AS ' . $alias : '');
     }
     /**
@@ -78,7 +69,7 @@ abstract class AbstractSql implements SqlInterface {
      * @return string
      * @throws Exception\RuntimeException
      */
-    protected function processExpression(ExpressionInterface $expression, PlatformInterface $platform, $namedParameterPrefix = null) {
+    protected function processExpression(ExpressionInterface $expression, PlatformInterface $platform, ?string $namedParameterPrefix = null): string {
         $namedParameterPrefix = ! $namedParameterPrefix ? $namedParameterPrefix : $this->processInfo['paramPrefix'] .
             $namedParameterPrefix;
         // static counter for the number of times this method was invoked across the PHP runtime
@@ -158,7 +149,7 @@ abstract class AbstractSql implements SqlInterface {
      *
      * @throws Exception\RuntimeException
      */
-    protected function createSqlFromSpecificationAndParameters($specifications, $parameters) {
+    protected function createSqlFromSpecificationAndParameters(string|array $specifications, array $parameters): string {
         if (is_string($specifications)) {
             return vsprintf($specifications, $parameters);
         }
@@ -218,20 +209,20 @@ abstract class AbstractSql implements SqlInterface {
      * @param PlatformInterface $platform
      * @return string
      */
-    protected function processSubSelect(Select $subselect, PlatformInterface $platform) {
+    protected function processSubSelect(Select $subselect, PlatformInterface $platform): string {
         return $subselect->buildSqlString($platform);
     }
     /**
      *
-     * @param Join[] $joins
+     * @param Join $joins
      * @param PlatformInterface $platform
      * @return null|string[] Null if no joins present, array of JOIN statements
      *         otherwise
      * @throws Exception\InvalidArgumentException for invalid JOIN table names.
      */
-    protected function processJoin(Join $joins, PlatformInterface $platform) {
+    protected function processJoin(Join $joins, PlatformInterface $platform): ?array {
         if (! $joins->count()) {
-            return;
+            return null;
         }
 
         // process joins
@@ -304,7 +295,7 @@ abstract class AbstractSql implements SqlInterface {
      * @param null|string $namedParameterPrefix
      * @return string
      */
-    protected function resolveColumnValue($column, PlatformInterface $platform, $namedParameterPrefix = null) {
+    protected function resolveColumnValue(mixed $column, PlatformInterface $platform, ?string $namedParameterPrefix = null): string {
         $namedParameterPrefix = ! $namedParameterPrefix ? $namedParameterPrefix : $this->processInfo['paramPrefix'] .
             $namedParameterPrefix;
         $isIdentifier = false;
@@ -328,6 +319,7 @@ abstract class AbstractSql implements SqlInterface {
         if ($column === null) {
             return 'NULL';
         }
+        $column = (string)$column;
         return $isIdentifier ? $fromTable .
             $platform->quoteIdentifierInFragment($column) : $platform->quoteValue($column);
     }
@@ -335,9 +327,9 @@ abstract class AbstractSql implements SqlInterface {
      *
      * @param string|TableIdentifier|Select $table
      * @param PlatformInterface $platform
-     * @return string
+     * @return string|array
      */
-    protected function resolveTable($table, PlatformInterface $platform) {
+    protected function resolveTable(string|TableIdentifier|Select $table, PlatformInterface $platform): string|array {
         $schema = null;
         if ($table instanceof TableIdentifier) {
             [
@@ -360,7 +352,7 @@ abstract class AbstractSql implements SqlInterface {
     /**
      * Copy variables from the subject into the local properties
      */
-    protected function localizeVariables() {
+    protected function localizeVariables(): void {
         if (isset($this->subject)) {
             foreach (get_object_vars($this->subject) as $name => $value) {
                 $this->{$name} = $value;

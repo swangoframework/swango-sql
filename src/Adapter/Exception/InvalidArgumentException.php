@@ -2,4 +2,5 @@
 namespace Sql\Adapter\Exception;
 use Sql\Exception;
 
-class InvalidArgumentException extends Exception\InvalidArgumentException implements ExceptionInterface {}
+class InvalidArgumentException extends Exception\InvalidArgumentException implements ExceptionInterface {
+}

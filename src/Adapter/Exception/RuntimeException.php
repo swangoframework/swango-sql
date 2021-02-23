@@ -2,4 +2,5 @@
 namespace Sql\Adapter\Exception;
 use Sql\Exception;
 
-class RuntimeException extends Exception\RuntimeException implements ExceptionInterface {}
+class RuntimeException extends Exception\RuntimeException implements ExceptionInterface {
+}

@@ -1,9 +1,7 @@
 <?php
 namespace Sql;
 use Sql\Adapter\Platform\PlatformInterface;
-
 /**
- *
  * @property Where $where
  * @property Having $having
  */
@@ -52,18 +50,16 @@ class Select extends AbstractSql {
      * @deprecated use JOIN_LEFT_OUTER instead
      */
     const JOIN_OUTER_LEFT = 'outer left';
-
     /**
      *
      * @deprecated use JOIN_LEFT_OUTER instead
      */
     const JOIN_OUTER_RIGHT = 'outer right';
-
     /**
      *
      * @var array Specifications
      */
-    protected $specifications = [
+    protected array $specifications = [
         'statementStart' => '%1$s',
         self::SELECT => [
             'SELECT %1$s FROM %2$s' => [
@@ -125,105 +121,29 @@ class Select extends AbstractSql {
         self::COMBINE => '%1$s ( %2$s )',
         self::TAIL => '%1$s'
     ];
-
-    /**
-     *
-     * @var bool
-     */
-    protected $tableReadOnly = false;
-
-    /**
-     *
-     * @var bool
-     */
-    protected $prefixColumnsWithTable = true;
-
-    /**
-     *
-     * @var string|array|TableIdentifier
-     */
-    protected $table = null;
-
-    /**
-     *
-     * @var null|string|Expression
-     */
-    protected $quantifier = null;
-
-    /**
-     *
-     * @var array
-     */
-    protected $columns = [
+    protected bool $tableReadOnly = false;
+    protected bool $prefixColumnsWithTable = true;
+    protected string|array|TableIdentifier|null $table = null;
+    protected null|string|Expression $quantifier = null;
+    protected array $columns = [
         self::SQL_STAR
     ];
-
-    /**
-     *
-     * @var null|Join
-     */
-    protected $joins = null;
-
-    /**
-     *
-     * @var Where
-     */
-    protected $where = null;
-
-    /**
-     *
-     * @var array
-     */
-    protected $order = [];
-
-    /**
-     *
-     * @var null|array
-     */
-    protected $group = null;
-
-    /**
-     *
-     * @var null|string|array
-     */
-    protected $having = null;
-
-    /**
-     *
-     * @var int|null
-     */
-    protected $limit = null;
-
-    /**
-     *
-     * @var int|null
-     */
-    protected $offset = null;
-
-    /**
-     *
-     * @var string|null
-     */
-    protected $forceIndex = null;
-
-    /**
-     *
-     * @var string|null
-     */
-    protected $tail = null;
-
-    /**
-     *
-     * @var array
-     */
-    protected $combine = [];
-
+    protected ?Join $joins = null;
+    protected ?Where $where = null;
+    protected array $order = [];
+    protected ?array $group = null;
+    protected null|string|array|Having $having = null;
+    protected ?int $limit = null;
+    protected ?int $offset = null;
+    protected ?string $forceIndex = null;
+    protected ?string $tail = null;
+    protected array $combine = [];
     /**
      * Constructor
      *
      * @param null|string|array|TableIdentifier $table
      */
-    public function __construct($table = null) {
+    public function __construct(null|string|array|TableIdentifier $table = null) {
         if ($table) {
             $this->from($table);
             $this->tableReadOnly = true;
@@ -233,7 +153,6 @@ class Select extends AbstractSql {
         $this->joins = new Join();
         $this->having = new Having();
     }
-
     /**
      * Create from clause
      *
@@ -241,26 +160,22 @@ class Select extends AbstractSql {
      * @return self Provides a fluent interface
      * @throws Exception\InvalidArgumentException
      */
-    public function from($table): self {
+    public function from(string|array|TableIdentifier $table): self {
         if ($this->tableReadOnly) {
-            throw new Exception\InvalidArgumentException(
-                'Since this object was created with a table and/or schema in the constructor, it is read only.');
+            throw new Exception\InvalidArgumentException('Since this object was created with a table and/or schema in the constructor, it is read only.');
         }
 
         if (! is_string($table) && ! is_array($table) && ! $table instanceof TableIdentifier) {
-            throw new Exception\InvalidArgumentException(
-                '$table must be a string, array or an instance of TableIdentifier');
+            throw new Exception\InvalidArgumentException('$table must be a string, array or an instance of TableIdentifier');
         }
 
         if (is_array($table) && (! is_string(key($table)) || count($table) !== 1)) {
-            throw new Exception\InvalidArgumentException(
-                'from() expects $table as an array is a single element associative array');
+            throw new Exception\InvalidArgumentException('from() expects $table as an array is a single element associative array');
         }
 
         $this->table = $table;
         return $this;
     }
-
     /**
      *
      * @param string|Expression $quantifier
@@ -268,16 +183,14 @@ class Select extends AbstractSql {
      * @return self Provides a fluent interface
      * @throws Exception\InvalidArgumentException
      */
-    public function quantifier($quantifier): self {
+    public function quantifier(string|Expression $quantifier): self {
         if (! is_string($quantifier) && ! $quantifier instanceof ExpressionInterface) {
-            throw new Exception\InvalidArgumentException(
-                'Quantifier must be one of DISTINCT, ALL, or some platform specific object implementing ' .
-                     'ExpressionInterface');
+            throw new Exception\InvalidArgumentException('Quantifier must be one of DISTINCT, ALL, or some platform specific object implementing ' .
+                'ExpressionInterface');
         }
         $this->quantifier = $quantifier;
         return $this;
     }
-
     /**
      * Specify columns from which to select
      *
@@ -301,7 +214,6 @@ class Select extends AbstractSql {
         $this->prefixColumnsWithTable = (bool)$prefixColumnsWithTable;
         return $this;
     }
-
     /**
      * Create join clause
      *
@@ -313,12 +225,11 @@ class Select extends AbstractSql {
      * @return self Provides a fluent interface
      * @throws Exception\InvalidArgumentException
      */
-    public function join($name, $on, $columns = self::SQL_STAR, string $type = self::JOIN_INNER): self {
+    public function join(string|array|TableIdentifier $name, string|Predicate\Expression $on, string|array $columns = self::SQL_STAR, string $type = self::JOIN_INNER): self {
         $this->joins->join($name, $on, $columns, $type);
 
         return $this;
     }
-
     /**
      * Create where clause
      *
@@ -328,7 +239,7 @@ class Select extends AbstractSql {
      * @return self Provides a fluent interface
      * @throws Exception\InvalidArgumentException
      */
-    public function where($predicate, string $combination = Predicate\PredicateSet::OP_AND): self {
+    public function where(Where|\Closure|string|array|Predicate\PredicateInterface $predicate, string $combination = Predicate\PredicateSet::OP_AND): self {
         if ($predicate instanceof Where) {
             $this->where = $predicate;
         } else {
@@ -336,13 +247,12 @@ class Select extends AbstractSql {
         }
         return $this;
     }
-
     /**
      *
      * @param mixed $group
      * @return self Provides a fluent interface
      */
-    public function group($group): self {
+    public function group(mixed $group): self {
         if (is_array($group)) {
             foreach ($group as $o) {
                 $this->group[] = $o;
@@ -352,7 +262,6 @@ class Select extends AbstractSql {
         }
         return $this;
     }
-
     /**
      * Create having clause
      *
@@ -361,7 +270,7 @@ class Select extends AbstractSql {
      *            One of the OP_* constants from Predicate\PredicateSet
      * @return self Provides a fluent interface
      */
-    public function having($predicate, string $combination = Predicate\PredicateSet::OP_AND): self {
+    public function having(Where|\Closure|string|array $predicate, string $combination = Predicate\PredicateSet::OP_AND): self {
         if ($predicate instanceof Having) {
             $this->having = $predicate;
         } else {
@@ -369,13 +278,12 @@ class Select extends AbstractSql {
         }
         return $this;
     }
-
     /**
      *
      * @param string|array|Expression $order
      * @return self Provides a fluent interface
      */
-    public function order($order): self {
+    public function order(string|array|Expression $order): self {
         if (is_string($order)) {
             if (strpos($order, ',') !== false) {
                 $order = preg_split('#,\s+#', $order);
@@ -387,7 +295,7 @@ class Select extends AbstractSql {
                 $order
             ];
         }
-        foreach ($order as $k=>$v) {
+        foreach ($order as $k => $v) {
             if (is_string($k)) {
                 $this->order[$k] = $v;
             } else {
@@ -396,7 +304,6 @@ class Select extends AbstractSql {
         }
         return $this;
     }
-
     /**
      *
      * @param int $limit
@@ -407,7 +314,6 @@ class Select extends AbstractSql {
         $this->limit = $limit;
         return $this;
     }
-
     /**
      *
      * @param int $offset
@@ -418,7 +324,6 @@ class Select extends AbstractSql {
         $this->offset = $offset;
         return $this;
     }
-
     /**
      *
      * @param string $index
@@ -429,7 +334,6 @@ class Select extends AbstractSql {
         $this->forceIndex = $index;
         return $this;
     }
-
     /**
      *
      * @param Select $select
@@ -440,8 +344,7 @@ class Select extends AbstractSql {
      */
     public function combine(Select $select, string $type = self::COMBINE_UNION, string $modifier = ''): self {
         if ($this->combine !== []) {
-            throw new Exception\InvalidArgumentException(
-                'This Select object is already combined and cannot be combined with multiple Selects objects');
+            throw new Exception\InvalidArgumentException('This Select object is already combined and cannot be combined with multiple Selects objects');
         }
         $this->combine = [
             'select' => $select,
@@ -450,7 +353,6 @@ class Select extends AbstractSql {
         ];
         return $this;
     }
-
     /**
      *
      * @param Select $select
@@ -463,7 +365,6 @@ class Select extends AbstractSql {
         $this->tail = $tail;
         return $this;
     }
-
     /**
      *
      * @param string $part
@@ -474,8 +375,7 @@ class Select extends AbstractSql {
         switch ($part) {
             case self::TABLE :
                 if ($this->tableReadOnly) {
-                    throw new Exception\InvalidArgumentException(
-                        'Since this object was created with a table and/or schema in the constructor, it is read only.');
+                    throw new Exception\InvalidArgumentException('Since this object was created with a table and/or schema in the constructor, it is read only.');
                 }
                 $this->table = null;
                 break;
@@ -512,7 +412,6 @@ class Select extends AbstractSql {
         }
         return $this;
     }
-
     /**
      *
      * @param
@@ -544,7 +443,6 @@ class Select extends AbstractSql {
         ];
         return (isset($key) && array_key_exists($key, $rawState)) ? $rawState[$key] : $rawState;
     }
-
     /**
      * Returns whether the table is read only or not.
      *
@@ -553,34 +451,38 @@ class Select extends AbstractSql {
     public function isTableReadOnly(): bool {
         return $this->tableReadOnly;
     }
-    protected function processStatementStart(PlatformInterface $platform) {
+    protected function processStatementStart(PlatformInterface $platform): ?array {
         if ($this->combine !== []) {
             return [
                 '('
             ];
         }
+        return null;
     }
-    protected function processStatementEnd(PlatformInterface $platform) {
+    protected function processStatementEnd(PlatformInterface $platform): ?array {
         if ($this->combine !== []) {
             return [
                 ')'
             ];
         }
+        return null;
     }
-
     /**
      * Process the select part
      *
      * @param PlatformInterface $platform
-     * @return null|array
+     * @return array
      */
-    protected function processSelect(PlatformInterface $platform) {
+    protected function processSelect(PlatformInterface $platform): array {
         $expr = 1;
 
-        list($table, $fromTable) = $this->resolveTable($this->table, $platform);
+        [
+            $table,
+            $fromTable
+        ] = $this->resolveTable($this->table, $platform);
         // process table columns
         $columns = [];
-        foreach ($this->columns as $columnIndexOrAs=>$column) {
+        foreach ($this->columns as $columnIndexOrAs => $column) {
             if ($column === self::SQL_STAR) {
                 $columns[] = [
                     $fromTable . self::SQL_STAR
@@ -588,17 +490,16 @@ class Select extends AbstractSql {
                 continue;
             }
 
-            $columnName = $this->resolveColumnValue(
-                [
-                    'column' => $column,
-                    'fromTable' => $fromTable,
-                    'isIdentifier' => true
-                ], $platform, (is_string($columnIndexOrAs) ? $columnIndexOrAs : 'column'));
+            $columnName = $this->resolveColumnValue([
+                'column' => $column,
+                'fromTable' => $fromTable,
+                'isIdentifier' => true
+            ], $platform, (is_string($columnIndexOrAs) ? $columnIndexOrAs : 'column'));
             // process As portion
             if (is_string($columnIndexOrAs)) {
                 $columnAs = $platform->quoteIdentifier($columnIndexOrAs);
             } elseif (stripos($columnName, ' as ') === false) {
-                $columnAs = (is_string($column)) ? $platform->quoteIdentifier($column) : 'Expression' . $expr ++;
+                $columnAs = (is_string($column)) ? $platform->quoteIdentifier($column) : 'Expression' . $expr++;
             }
             $columns[] = (isset($columnAs)) ? [
                 $columnName,
@@ -613,15 +514,14 @@ class Select extends AbstractSql {
             $joinName = (is_array($join['name'])) ? key($join['name']) : $join['name'];
             $joinName = parent::resolveTable($joinName, $platform);
 
-            foreach ($join['columns'] as $jKey=>$jColumn) {
+            foreach ($join['columns'] as $jKey => $jColumn) {
                 $jColumns = [];
                 $jFromTable = is_scalar($jColumn) ? $joinName . $platform->getIdentifierSeparator() : '';
-                $jColumns[] = $this->resolveColumnValue(
-                    [
-                        'column' => $jColumn,
-                        'fromTable' => $jFromTable,
-                        'isIdentifier' => true
-                    ], $platform, (is_string($jKey) ? $jKey : 'column'));
+                $jColumns[] = $this->resolveColumnValue([
+                    'column' => $jColumn,
+                    'fromTable' => $jFromTable,
+                    'isIdentifier' => true
+                ], $platform, (is_string($jKey) ? $jKey : 'column'));
                 if (is_string($jKey)) {
                     $jColumns[] = $platform->quoteIdentifier($jKey);
                 } elseif ($jColumn !== self::SQL_STAR) {
@@ -632,8 +532,9 @@ class Select extends AbstractSql {
         }
 
         if ($this->quantifier) {
-            $quantifier = ($this->quantifier instanceof ExpressionInterface) ? $this->processExpression(
-                $this->quantifier, $platform, 'quantifier') : $this->quantifier;
+            $quantifier = ($this->quantifier instanceof
+                ExpressionInterface) ? $this->processExpression($this->quantifier, $platform,
+                'quantifier') : $this->quantifier;
         }
 
         if (! isset($table)) {
@@ -653,48 +554,47 @@ class Select extends AbstractSql {
             ];
         }
     }
-    protected function processJoins(PlatformInterface $platform) {
+    protected function processJoins(PlatformInterface $platform): ?array {
         return $this->processJoin($this->joins, $platform);
     }
-    protected function processWhere(PlatformInterface $platform) {
+    protected function processWhere(PlatformInterface $platform): ?array {
         if ($this->where->count() == 0) {
-            return;
+            return null;
         }
         return [
             $this->processExpression($this->where, $platform, 'where')
         ];
     }
-    protected function processGroup(PlatformInterface $platform) {
+    protected function processGroup(PlatformInterface $platform): ?array {
         if ($this->group === null) {
-            return;
+            return null;
         }
         // process table columns
         $groups = [];
         foreach ($this->group as $column) {
-            $groups[] = $this->resolveColumnValue(
-                [
-                    'column' => $column,
-                    'isIdentifier' => true
-                ], $platform, 'group');
+            $groups[] = $this->resolveColumnValue([
+                'column' => $column,
+                'isIdentifier' => true
+            ], $platform, 'group');
         }
         return [
             $groups
         ];
     }
-    protected function processHaving(PlatformInterface $platform) {
+    protected function processHaving(PlatformInterface $platform): ?array {
         if ($this->having->count() == 0) {
-            return;
+            return null;
         }
         return [
             $this->processExpression($this->having, $platform, 'having')
         ];
     }
-    protected function processOrder(PlatformInterface $platform) {
+    protected function processOrder(PlatformInterface $platform): ?array {
         if (empty($this->order)) {
-            return;
+            return null;
         }
         $orders = [];
-        foreach ($this->order as $k=>$v) {
+        foreach ($this->order as $k => $v) {
             if ($v instanceof ExpressionInterface) {
                 $orders[] = [
                     $this->processExpression($v, $platform)
@@ -703,7 +603,10 @@ class Select extends AbstractSql {
             }
             if (is_int($k)) {
                 if (strpos($v, ' ') !== false) {
-                    list($k, $v) = preg_split('# #', $v, 2);
+                    [
+                        $k,
+                        $v
+                    ] = preg_split('# #', $v, 2);
                 } else {
                     $k = $v;
                     $v = self::ORDER_ASCENDING;
@@ -725,25 +628,25 @@ class Select extends AbstractSql {
             $orders
         ];
     }
-    protected function processLimit(PlatformInterface $platform) {
+    protected function processLimit(PlatformInterface $platform): ?array {
         if ($this->limit === null) {
-            return;
+            return null;
         }
         return [
             $this->limit
         ];
     }
-    protected function processOffset(PlatformInterface $platform) {
+    protected function processOffset(PlatformInterface $platform): ?array {
         if ($this->offset === null) {
-            return;
+            return null;
         }
         return [
             $this->offset
         ];
     }
-    protected function processCombine(PlatformInterface $platform) {
+    protected function processCombine(PlatformInterface $platform): ?array {
         if ($this->combine == []) {
-            return;
+            return null;
         }
 
         $type = $this->combine['type'];
@@ -756,36 +659,26 @@ class Select extends AbstractSql {
             $this->processSubSelect($this->combine['select'], $platform)
         ];
     }
-
     /**
-     * add by fdream, 2019-06-06
-     *
      * @param PlatformInterface $platform
-     * @param DriverInterface $driver
-     * @param ParameterContainer $parameterContainer
      * @return void|string[]
      */
-    protected function processForceIndex(PlatformInterface $platform) {
+    protected function processForceIndex(PlatformInterface $platform): ?array {
         if ($this->forceIndex === null) {
-            return;
+            return null;
         }
 
         return [
             $platform->quoteIdentifier($this->forceIndex)
         ];
     }
-
     /**
-     * add by fdream, 2019-06-06
-     *
      * @param PlatformInterface $platform
-     * @param DriverInterface $driver
-     * @param ParameterContainer $parameterContainer
      * @return void|string[]
      */
-    protected function processTail(PlatformInterface $platform) {
+    protected function processTail(PlatformInterface $platform): ?array {
         if ($this->tail === null) {
-            return;
+            return null;
         }
 
         return [
@@ -796,10 +689,10 @@ class Select extends AbstractSql {
      * Variable overloading
      *
      * @param string $name
-     * @throws Exception\InvalidArgumentException
      * @return mixed
+     * @throws Exception\InvalidArgumentException
      */
-    public function __get($name) {
+    public function __get(string $name): mixed {
         switch (strtolower($name)) {
             case 'where' :
                 return $this->where;
@@ -811,7 +704,6 @@ class Select extends AbstractSql {
                 throw new Exception\InvalidArgumentException('Not a valid magic property for this object');
         }
     }
-
     /**
      * __clone
      *
@@ -824,14 +716,13 @@ class Select extends AbstractSql {
         $this->joins = clone $this->joins;
         $this->having = clone $this->having;
     }
-
     /**
      *
      * @param string|TableIdentifier|Select $table
      * @param PlatformInterface $platform
-     * @return string
+     * @return string|array
      */
-    protected function resolveTable($table, PlatformInterface $platform) {
+    protected function resolveTable(string|TableIdentifier|Select $table, PlatformInterface $platform): string|array {
         $alias = null;
 
         if (is_array($table)) {

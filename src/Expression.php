@@ -1,35 +1,16 @@
 <?php
 namespace Sql;
 class Expression extends AbstractExpression {
-    /**
-     * @const
-     */
     const PLACEHOLDER = '?';
-
-    /**
-     *
-     * @var string
-     */
-    protected $expression = '';
-
-    /**
-     *
-     * @var array
-     */
-    protected $parameters = [];
-
-    /**
-     *
-     * @var array
-     */
-    protected $types = [];
-
+    protected string $expression = '';
+    protected array $parameters = [];
+    protected array $types = [];
     /**
      *
      * @param string $expression
      * @param string|array $parameters
      */
-    public function __construct(string $expression = '', $parameters = null) {
+    public function __construct(string $expression = '', string|array|null $parameters = null) {
         if ($expression !== '') {
             $this->setExpression($expression);
         }
@@ -38,7 +19,6 @@ class Expression extends AbstractExpression {
             $this->setParameters($parameters);
         }
     }
-
     /**
      *
      * @param
@@ -46,22 +26,20 @@ class Expression extends AbstractExpression {
      * @return self Provides a fluent interface
      * @throws Exception\InvalidArgumentException
      */
-    public function setExpression(string $expression) {
+    public function setExpression(string $expression): self {
         if ($expression === '') {
             throw new Exception\InvalidArgumentException('Supplied expression must be a string.');
         }
         $this->expression = $expression;
         return $this;
     }
-
     /**
      *
      * @return string
      */
-    public function getExpression() {
+    public function getExpression(): string {
         return $this->expression;
     }
-
     /**
      *
      * @param
@@ -69,44 +47,40 @@ class Expression extends AbstractExpression {
      * @return self Provides a fluent interface
      * @throws Exception\InvalidArgumentException
      */
-    public function setParameters($parameters) {
+    public function setParameters(mixed $parameters): self {
         if (! is_scalar($parameters) && ! is_array($parameters)) {
             throw new Exception\InvalidArgumentException('Expression parameters must be a scalar or array.');
         }
         $this->parameters = $parameters;
         return $this;
     }
-
     /**
      *
      * @return array
      */
-    public function getParameters() {
+    public function getParameters(): array {
         return $this->parameters;
     }
-
     /**
-     *
-     * @deprecated
      *
      * @param array $types
      * @return self Provides a fluent interface
+     * @deprecated
+     *
      */
-    public function setTypes(array $types) {
+    public function setTypes(array $types): self {
         $this->types = $types;
         return $this;
     }
-
     /**
      *
+     * @return array
      * @deprecated
      *
-     * @return array
      */
-    public function getTypes() {
+    public function getTypes(): array {
         return $this->types;
     }
-
     /**
      *
      * @return array
@@ -131,8 +105,7 @@ class Expression extends AbstractExpression {
         // test number of replacements without considering same variable begin used many times first, which is
         // faster, if the test fails then resort to regex which are slow and used rarely
         if ($count !== $parametersCount && $parametersCount === preg_match_all('/\:[a-zA-Z0-9_]*/', $expression)) {
-            throw new Exception\RuntimeException(
-                'The number of replacements in the expression does not match the number of parameters');
+            throw new Exception\RuntimeException('The number of replacements in the expression does not match the number of parameters');
         }
 
         foreach ($parameters as $parameter) {

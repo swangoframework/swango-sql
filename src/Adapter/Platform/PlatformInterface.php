@@ -7,14 +7,12 @@ interface PlatformInterface {
      * @return string
      */
     public function getName(): string;
-
     /**
      * Get quote identifier symbol
      *
      * @return string
      */
     public function getQuoteIdentifierSymbol(): string;
-
     /**
      * Quote identifier
      *
@@ -22,22 +20,19 @@ interface PlatformInterface {
      * @return string
      */
     public function quoteIdentifier(string $identifier): string;
-
     /**
      * Quote identifier chain
      *
-     * @param string|string[] $identifierChain
+     * @param string $identifierChain
      * @return string
      */
-    public function quoteIdentifierChain($identifierChain): string;
-
+    public function quoteIdentifierChain(string $identifierChain): string;
     /**
      * Get quote value symbol
      *
      * @return string
      */
     public function getQuoteValueSymbol(): string;
-
     /**
      * Quote value
      *
@@ -46,8 +41,7 @@ interface PlatformInterface {
      * @param string $value
      * @return string
      */
-    public function quoteValue($value): string;
-
+    public function quoteValue(mixed $value): string;
     /**
      * Quote Trusted Value
      *
@@ -57,23 +51,20 @@ interface PlatformInterface {
      *            $value
      * @return string
      */
-    public function quoteTrustedValue($value): string;
-
+    public function quoteTrustedValue(string $value): string;
     /**
      * Quote value list
      *
      * @param string|string[] $valueList
      * @return string
      */
-    public function quoteValueList($valueList): string;
-
+    public function quoteValueList(string|array $valueList): string;
     /**
      * Get identifier separator
      *
      * @return string
      */
     public function getIdentifierSeparator(): string;
-
     /**
      * Quote identifier in fragment
      *

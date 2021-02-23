@@ -8,31 +8,27 @@ class Mysql extends AbstractPlatform {
      * {@inheritdoc}
      *
      */
-    protected $quoteIdentifier = [
+    protected array $quoteIdentifier = [
         '`',
         '`'
     ];
-
     /**
      *
      * {@inheritdoc}
      *
      */
-    protected $quoteIdentifierTo = '``';
-
+    protected string $quoteIdentifierTo = '``';
     /**
      *
      * @var \Swoole\Coroutine\MySQL|\mysqli|\PDO
      */
-    protected $resource = null;
-
+    protected mixed $resource = null;
     /**
      * NOTE: Include dashes for MySQL only, need tests for others platforms
      *
      * @var string
      */
-    protected $quoteIdentifierFragmentPattern = '/([^0-9,a-z,A-Z$_\-:])/i';
-
+    protected string $quoteIdentifierFragmentPattern = '/([^0-9,a-z,A-Z$_\-:])/i';
     /**
      *
      * @param \Swoole\Coroutine\MySQL|\mysqli|\PDO $driver
@@ -42,7 +38,6 @@ class Mysql extends AbstractPlatform {
             $this->setDriver($driver);
         }
     }
-
     /**
      *
      * @param \Swoole\Coroutine\MySQL|\mysqli|\PDO $driver
@@ -52,15 +47,13 @@ class Mysql extends AbstractPlatform {
     public function setDriver($driver): self {
         // handle Mysql drivers
         if (method_exists($driver, 'escape') || ($driver instanceof \mysqli) ||
-             ($driver instanceof \PDO && $driver->getAttribute(\PDO::ATTR_DRIVER_NAME) == 'mysql')) {
+            ($driver instanceof \PDO && $driver->getAttribute(\PDO::ATTR_DRIVER_NAME) == 'mysql')) {
             $this->resource = $driver;
             return $this;
         }
 
-        throw new Exception\InvalidArgumentException(
-            '$driver must be a Mysqli or Mysql PDO Sql\Adapter\Driver, Mysqli instance or MySQL PDO instance');
+        throw new Exception\InvalidArgumentException('$driver must be a Mysqli or Mysql PDO Sql\Adapter\Driver, Mysqli instance or MySQL PDO instance');
     }
-
     /**
      *
      * {@inheritdoc}
@@ -69,22 +62,20 @@ class Mysql extends AbstractPlatform {
     public function getName(): string {
         return 'MySQL';
     }
-
     /**
      *
      * {@inheritdoc}
      *
      */
-    public function quoteIdentifierChain($identifierChain): string {
+    public function quoteIdentifierChain(string $identifierChain): string {
         return '`' . implode('`.`', (array)str_replace('`', '``', $identifierChain)) . '`';
     }
-
     /**
      *
      * {@inheritdoc}
      *
      */
-    public function quoteValue($value): string {
+    public function quoteValue(mixed $value): string {
         if (method_exists($this->resource, 'escape')) {
             return '\'' . $this->resource->escape($value) . '\'';
         }
@@ -96,13 +87,12 @@ class Mysql extends AbstractPlatform {
         }
         return parent::quoteValue($value);
     }
-
     /**
      *
      * {@inheritdoc}
      *
      */
-    public function quoteTrustedValue($value): string {
+    public function quoteTrustedValue(string $value): string {
         if (method_exists($this->resource, 'escape')) {
             return '\'' . $this->resource->escape($value) . '\'';
         }

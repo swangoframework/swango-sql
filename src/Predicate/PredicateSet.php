@@ -8,16 +8,15 @@ class PredicateSet implements PredicateInterface, Countable {
     const OP_AND = 'AND';
     const COMBINED_BY_OR = 'OR';
     const OP_OR = 'OR';
-    protected $defaultCombination = self::COMBINED_BY_AND;
-    protected $predicates = [];
-
+    protected string $defaultCombination = self::COMBINED_BY_AND;
+    protected array $predicates = [];
     /**
      * Constructor
      *
      * @param null|array $predicates
      * @param string $defaultCombination
      */
-    public function __construct(array $predicates = null, $defaultCombination = self::COMBINED_BY_AND) {
+    public function __construct(array $predicates = null, string $defaultCombination = self::COMBINED_BY_AND) {
         $this->defaultCombination = $defaultCombination;
         if ($predicates) {
             foreach ($predicates as $predicate) {
@@ -25,7 +24,6 @@ class PredicateSet implements PredicateInterface, Countable {
             }
         }
     }
-
     /**
      * Add predicate to set
      *
@@ -33,7 +31,7 @@ class PredicateSet implements PredicateInterface, Countable {
      * @param string $combination
      * @return self Provides a fluent interface
      */
-    public function addPredicate(PredicateInterface $predicate, ?string $combination = null) {
+    public function addPredicate(PredicateInterface $predicate, ?string $combination = null): self {
         if ($combination === self::OP_OR) {
             $this->orPredicate($predicate);
         } else {
@@ -41,7 +39,6 @@ class PredicateSet implements PredicateInterface, Countable {
         }
         return $this;
     }
-
     /**
      * Add predicates to set
      *
@@ -50,7 +47,7 @@ class PredicateSet implements PredicateInterface, Countable {
      * @return self Provides a fluent interface
      * @throws Exception\InvalidArgumentException
      */
-    public function addPredicates($predicates, $combination = self::OP_AND) {
+    public function addPredicates(PredicateInterface|\Closure|string|array $predicates, string $combination = self::OP_AND): self {
         if ($predicates === null) {
             throw new Exception\InvalidArgumentException('Predicate cannot be null');
         }
@@ -64,13 +61,13 @@ class PredicateSet implements PredicateInterface, Countable {
         }
         if (is_string($predicates)) {
             // String $predicate should be passed as an expression
-            $predicates = (strpos($predicates, Expression::PLACEHOLDER) !== false) ? new Expression($predicates) : new Literal(
-                $predicates);
+            $predicates = (strpos($predicates, Expression::PLACEHOLDER) !==
+                false) ? new Expression($predicates) : new Literal($predicates);
             $this->addPredicate($predicates, $combination);
             return $this;
         }
         if (is_array($predicates)) {
-            foreach ($predicates as $pkey=>$pvalue) {
+            foreach ($predicates as $pkey => $pvalue) {
                 // loop through predicates
                 if (is_string($pkey)) {
                     if (strpos($pkey, '?') !== false) {
@@ -95,52 +92,48 @@ class PredicateSet implements PredicateInterface, Countable {
                     $predicates = $pvalue;
                 } else {
                     // must be an array of expressions (with int-indexed array)
-                    $predicates = (strpos($pvalue, Expression::PLACEHOLDER) !== false) ? new Expression($pvalue) : new Literal(
-                        $pvalue);
+                    $predicates = (strpos($pvalue, Expression::PLACEHOLDER) !==
+                        false) ? new Expression($pvalue) : new Literal($pvalue);
                 }
                 $this->addPredicate($predicates, $combination);
             }
         }
         return $this;
     }
-
     /**
      * Return the predicates
      *
      * @return PredicateInterface[]
      */
-    public function getPredicates() {
+    public function getPredicates(): array {
         return $this->predicates;
     }
-
     /**
      * Add predicate using OR operator
      *
      * @param PredicateInterface $predicate
      * @return self Provides a fluent interface
      */
-    public function orPredicate(PredicateInterface $predicate) {
+    public function orPredicate(PredicateInterface $predicate): self {
         $this->predicates[] = [
             self::OP_OR,
             $predicate
         ];
         return $this;
     }
-
     /**
      * Add predicate using AND operator
      *
      * @param PredicateInterface $predicate
      * @return self Provides a fluent interface
      */
-    public function andPredicate(PredicateInterface $predicate) {
+    public function andPredicate(PredicateInterface $predicate): self {
         $this->predicates[] = [
             self::OP_AND,
             $predicate
         ];
         return $this;
     }
-
     /**
      * Get predicate parts for where statement
      *
@@ -148,7 +141,7 @@ class PredicateSet implements PredicateInterface, Countable {
      */
     public function getExpressionData(): array {
         $parts = [];
-        for($i = 0, $count = count($this->predicates); $i < $count; $i ++) {
+        for ($i = 0, $count = count($this->predicates); $i < $count; $i++) {
             /** @var $predicate PredicateInterface */
             $predicate = $this->predicates[$i][1];
 
@@ -168,7 +161,6 @@ class PredicateSet implements PredicateInterface, Countable {
         }
         return $parts;
     }
-
     /**
      * Get count of attached predicates
      *

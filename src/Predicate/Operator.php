@@ -16,47 +16,20 @@ class Operator extends AbstractExpression implements PredicateInterface {
     const OP_GT = '>';
     const OPERATOR_GREATER_THAN_OR_EQUAL_TO = '>=';
     const OP_GTE = '>=';
-
     /**
      *
      * {@inheritdoc}
      *
      */
-    protected $allowedTypes = [
+    protected array $allowedTypes = [
         self::TYPE_IDENTIFIER,
         self::TYPE_VALUE
     ];
-
-    /**
-     *
-     * @var int|float|bool|string
-     */
-    protected $left;
-
-    /**
-     *
-     * @var int|float|bool|string
-     */
-    protected $right;
-
-    /**
-     *
-     * @var string
-     */
-    protected $leftType = self::TYPE_IDENTIFIER;
-
-    /**
-     *
-     * @var string
-     */
-    protected $rightType = self::TYPE_VALUE;
-
-    /**
-     *
-     * @var string
-     */
-    protected $operator = self::OPERATOR_EQUAL_TO;
-
+    protected int|float|bool|string $left;
+    protected int|float|bool|string $right;
+    protected string $leftType = self::TYPE_IDENTIFIER;
+    protected string $rightType = self::TYPE_VALUE;
+    protected string $operator = self::OPERATOR_EQUAL_TO;
     /**
      * Constructor
      *
@@ -68,8 +41,7 @@ class Operator extends AbstractExpression implements PredicateInterface {
      * @param string $rightType
      *            TYPE_IDENTIFIER or TYPE_VALUE by default TYPE_VALUE {@see allowedTypes}
      */
-    public function __construct($left = null, string $operator = self::OPERATOR_EQUAL_TO, $right = null, string $leftType = self::TYPE_IDENTIFIER,
-        string $rightType = self::TYPE_VALUE) {
+    public function __construct(int|float|bool|string|null $left = null, string $operator = self::OPERATOR_EQUAL_TO, int|float|bool|string|null $right = null, string $leftType = self::TYPE_IDENTIFIER, string $rightType = self::TYPE_VALUE) {
         if ($left !== null) {
             $this->setLeft($left);
         }
@@ -90,7 +62,6 @@ class Operator extends AbstractExpression implements PredicateInterface {
             $this->setRightType($rightType);
         }
     }
-
     /**
      * Set left side of operator
      *
@@ -98,7 +69,7 @@ class Operator extends AbstractExpression implements PredicateInterface {
      *
      * @return self Provides a fluent interface
      */
-    public function setLeft($left): self {
+    public function setLeft(int|float|bool|string $left): self {
         $this->left = $left;
 
         if (is_array($left)) {
@@ -108,16 +79,14 @@ class Operator extends AbstractExpression implements PredicateInterface {
 
         return $this;
     }
-
     /**
      * Get left side of operator
      *
      * @return int|float|bool|string
      */
-    public function getLeft() {
+    public function getLeft(): int|float|bool|string {
         return $this->left;
     }
-
     /**
      * Set parameter type for left side of operator
      *
@@ -128,18 +97,16 @@ class Operator extends AbstractExpression implements PredicateInterface {
      *
      * @throws Exception\InvalidArgumentException
      */
-    public function setLeftType($type): self {
+    public function setLeftType(string $type): self {
         if (! in_array($type, $this->allowedTypes)) {
-            throw new Exception\InvalidArgumentException(
-                sprintf('Invalid type "%s" provided; must be of type "%s" or "%s"', $type,
-                    __CLASS__ . '::TYPE_IDENTIFIER', __CLASS__ . '::TYPE_VALUE'));
+            throw new Exception\InvalidArgumentException(sprintf('Invalid type "%s" provided; must be of type "%s" or "%s"',
+                $type, __CLASS__ . '::TYPE_IDENTIFIER', __CLASS__ . '::TYPE_VALUE'));
         }
 
         $this->leftType = $type;
 
         return $this;
     }
-
     /**
      * Get parameter type on left side of operator
      *
@@ -148,19 +115,17 @@ class Operator extends AbstractExpression implements PredicateInterface {
     public function getLeftType(): string {
         return $this->leftType;
     }
-
     /**
      * Set operator string
      *
      * @param string $operator
      * @return self Provides a fluent interface
      */
-    public function setOperator($operator): self {
+    public function setOperator(string $operator): self {
         $this->operator = $operator;
 
         return $this;
     }
-
     /**
      * Get operator string
      *
@@ -169,7 +134,6 @@ class Operator extends AbstractExpression implements PredicateInterface {
     public function getOperator(): string {
         return $this->operator;
     }
-
     /**
      * Set right side of operator
      *
@@ -177,7 +141,7 @@ class Operator extends AbstractExpression implements PredicateInterface {
      *
      * @return self Provides a fluent interface
      */
-    public function setRight($right): self {
+    public function setRight(int|float|bool|string $right): self {
         $this->right = $right;
 
         if (is_array($right)) {
@@ -187,16 +151,14 @@ class Operator extends AbstractExpression implements PredicateInterface {
 
         return $this;
     }
-
     /**
      * Get right side of operator
      *
      * @return int|float|bool|string
      */
-    public function getRight() {
+    public function getRight(): int|float|bool|string {
         return $this->right;
     }
-
     /**
      * Set parameter type for right side of operator
      *
@@ -205,18 +167,16 @@ class Operator extends AbstractExpression implements PredicateInterface {
      * @return self Provides a fluent interface
      * @throws Exception\InvalidArgumentException
      */
-    public function setRightType($type): self {
+    public function setRightType(string $type): self {
         if (! in_array($type, $this->allowedTypes)) {
-            throw new Exception\InvalidArgumentException(
-                sprintf('Invalid type "%s" provided; must be of type "%s" or "%s"', $type,
-                    __CLASS__ . '::TYPE_IDENTIFIER', __CLASS__ . '::TYPE_VALUE'));
+            throw new Exception\InvalidArgumentException(sprintf('Invalid type "%s" provided; must be of type "%s" or "%s"',
+                $type, __CLASS__ . '::TYPE_IDENTIFIER', __CLASS__ . '::TYPE_VALUE'));
         }
 
         $this->rightType = $type;
 
         return $this;
     }
-
     /**
      * Get parameter type on right side of operator
      *
@@ -225,7 +185,6 @@ class Operator extends AbstractExpression implements PredicateInterface {
     public function getRightType(): string {
         return $this->rightType;
     }
-
     /**
      * Get predicate parts for where statement
      *

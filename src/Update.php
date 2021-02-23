@@ -20,7 +20,7 @@ class Update extends AbstractSql {
     /**
      * @#-*
      */
-    protected $specifications = [
+    protected array $specifications = [
         self::SPECIFICATION_UPDATE => 'UPDATE %1$s',
         self::SPECIFICATION_JOIN => [
             '%1$s' => [
@@ -33,43 +33,12 @@ class Update extends AbstractSql {
         self::SPECIFICATION_SET => 'SET %1$s',
         self::SPECIFICATION_WHERE => 'WHERE %1$s'
     ];
-
-    /**
-     *
-     * @var string|TableIdentifier
-     */
-    protected $table = '';
-
-    /**
-     *
-     * @var bool
-     */
-    protected $emptyWhereProtection = true;
-
-    /**
-     *
-     * @var PriorityList
-     */
-    protected $set;
-
-    /**
-     *
-     * @var string|Where
-     */
-    protected $where = null;
-
-    /**
-     *
-     * @var null|Join
-     */
-    protected $joins = null;
-
-    /**
-     * Constructor
-     *
-     * @param null|string|TableIdentifier $table
-     */
-    public function __construct($table = null) {
+    protected string|TableIdentifier $table = '';
+    protected bool $emptyWhereProtection = true;
+    protected PriorityList $set;
+    protected null|string|Where $where = null;
+    protected Join $joins;
+    public function __construct(null|string|TableIdentifier $table = null) {
         if ($table) {
             $this->table($table);
         }
@@ -78,18 +47,13 @@ class Update extends AbstractSql {
         $this->set = new PriorityList();
         $this->set->isLIFO(false);
     }
-
     /**
      * Specify table for statement
-     *
-     * @param string|TableIdentifier $table
-     * @return self Provides a fluent interface
      */
-    public function table($table): self {
+    public function table(string|TableIdentifier $table): self {
         $this->table = $table;
         return $this;
     }
-
     /**
      * Set key/value pairs to update
      *
@@ -101,15 +65,11 @@ class Update extends AbstractSql {
      * @throws Exception\InvalidArgumentException
      */
     public function set(array $values, string $flag = self::VALUES_SET): self {
-        if ($values === null) {
-            throw new Exception\InvalidArgumentException('set() expects an array of values');
-        }
-
         if ($flag == self::VALUES_SET) {
             $this->set->clear();
         }
         $priority = is_numeric($flag) ? $flag : 0;
-        foreach ($values as $k=>$v) {
+        foreach ($values as $k => $v) {
             if (! is_string($k)) {
                 throw new Exception\InvalidArgumentException('set() expects a string for the value key');
             }
@@ -117,7 +77,6 @@ class Update extends AbstractSql {
         }
         return $this;
     }
-
     /**
      * Create where clause
      *
@@ -127,7 +86,7 @@ class Update extends AbstractSql {
      * @return self Provides a fluent interface
      * @throws Exception\InvalidArgumentException
      */
-    public function where($predicate, string $combination = Predicate\PredicateSet::OP_AND): self {
+    public function where(Where|\Closure|string|array $predicate, string $combination = Predicate\PredicateSet::OP_AND): self {
         if ($predicate instanceof Where) {
             $this->where = $predicate;
         } else {
@@ -135,7 +94,6 @@ class Update extends AbstractSql {
         }
         return $this;
     }
-
     /**
      * Create join clause
      *
@@ -149,7 +107,7 @@ class Update extends AbstractSql {
      * @return self Provides a fluent interface
      * @throws Exception\InvalidArgumentException for invalid $name values.
      */
-    public function join($name, $on, string $type = Join::JOIN_INNER): self {
+    public function join(string|array|TableIdentifier $name, string|Predicate\Expression $on, string $type = Join::JOIN_INNER): self {
         $this->joins->join($name, $on, [], $type);
 
         return $this;
@@ -164,20 +122,19 @@ class Update extends AbstractSql {
         ];
         return (isset($key) && array_key_exists($key, $rawState)) ? $rawState[$key] : $rawState;
     }
-    protected function processUpdate(PlatformInterface $platform) {
+    protected function processUpdate(PlatformInterface $platform): string {
         return sprintf($this->specifications[static::SPECIFICATION_UPDATE],
             $this->resolveTable($this->table, $platform));
     }
     protected function processSet(PlatformInterface $platform) {
         $setSql = [];
         $i = 0;
-        foreach ($this->set as $column=>$value) {
-            $prefix = $this->resolveColumnValue(
-                [
-                    'column' => $column,
-                    'fromTable' => '',
-                    'isIdentifier' => true
-                ], $platform, 'column');
+        foreach ($this->set as $column => $value) {
+            $prefix = $this->resolveColumnValue([
+                'column' => $column,
+                'fromTable' => '',
+                'isIdentifier' => true
+            ], $platform, 'column');
             $prefix .= ' = ';
             $setSql[] = $prefix . $this->resolveColumnValue($value, $platform);
         }
@@ -194,7 +151,6 @@ class Update extends AbstractSql {
     protected function processJoins(PlatformInterface $platform) {
         return $this->processJoin($this->joins, $platform);
     }
-
     /**
      * Variable overloading
      * Proxies to "where" only
@@ -202,12 +158,11 @@ class Update extends AbstractSql {
      * @param string $name
      * @return mixed
      */
-    public function __get($name) {
+    public function __get(string $name): mixed {
         if (strtolower($name) == 'where') {
             return $this->where;
         }
     }
-
     /**
      * __clone
      * Resets the where object each time the Update is cloned.

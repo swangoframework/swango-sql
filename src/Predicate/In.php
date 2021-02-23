@@ -5,18 +5,17 @@ use Sql\Select;
 use Sql\AbstractExpression;
 
 class In extends AbstractExpression implements PredicateInterface {
-    protected $identifier;
-    protected $valueSet;
-    protected $specification = '%s IN %s';
-    protected $valueSpecSpecification = '%%s IN (%s)';
-
+    protected null|string|array $identifier = null;
+    protected array|Select $valueSet;
+    protected string $specification = '%s IN %s';
+    protected string $valueSpecSpecification = '%%s IN (%s)';
     /**
      * Constructor
      *
      * @param null|string|array $identifier
      * @param null|array|Select $valueSet
      */
-    public function __construct($identifier = null, $valueSet = null) {
+    public function __construct(string|array $identifier = null, array|Select $valueSet = null) {
         if ($identifier) {
             $this->setIdentifier($identifier);
         }
@@ -24,28 +23,25 @@ class In extends AbstractExpression implements PredicateInterface {
             $this->setValueSet($valueSet);
         }
     }
-
     /**
      * Set identifier for comparison
      *
      * @param string|array $identifier
      * @return self Provides a fluent interface
      */
-    public function setIdentifier($identifier) {
+    public function setIdentifier(string|array $identifier): self {
         $this->identifier = $identifier;
 
         return $this;
     }
-
     /**
      * Get identifier of comparison
      *
      * @return null|string|array
      */
-    public function getIdentifier() {
+    public function getIdentifier(): null|string|array {
         return $this->identifier;
     }
-
     /**
      * Set set of values for IN comparison
      *
@@ -53,25 +49,18 @@ class In extends AbstractExpression implements PredicateInterface {
      * @return self Provides a fluent interface
      * @throws Exception\InvalidArgumentException
      */
-    public function setValueSet($valueSet) {
-        if (! is_array($valueSet) && ! $valueSet instanceof Select) {
-            throw new Exception\InvalidArgumentException(
-                '$valueSet must be either an array or a Sql\Select object, ' . gettype($valueSet) . ' given');
-        }
+    public function setValueSet(array|Select $valueSet): self {
         $this->valueSet = $valueSet;
-
         return $this;
     }
-
     /**
      * Gets set of values in IN comparison
      *
      * @return array|Select
      */
-    public function getValueSet() {
+    public function getValueSet(): array|Select {
         return $this->valueSet;
     }
-
     /**
      * Return array of parts for where statement
      *
@@ -105,7 +94,8 @@ class In extends AbstractExpression implements PredicateInterface {
             }
             $countValues = count($values);
             $valuePlaceholders = $countValues > 0 ? array_fill(0, $countValues, '%s') : [];
-            $specification = sprintf($this->specification, $identifierSpecFragment, '(' . implode(', ', $valuePlaceholders) . ')');
+            $specification = sprintf($this->specification, $identifierSpecFragment,
+                '(' . implode(', ', $valuePlaceholders) . ')');
         }
 
         return [

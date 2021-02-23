@@ -11,33 +11,29 @@ class Combine extends AbstractSql {
     const COMBINE_UNION = 'union';
     const COMBINE_EXCEPT = 'except';
     const COMBINE_INTERSECT = 'intersect';
-
     /**
      *
      * @var string[]
      */
-    protected $specifications = [
+    protected array $specifications = [
         self::COMBINE => '%1$s (%2$s) '
     ];
-
     /**
      *
      * @var Select[][]
      */
-    private $combine = [];
-
+    private array $combine = [];
     /**
      *
      * @param Select|array|null $select
      * @param string $type
      * @param string $modifier
      */
-    public function __construct($select = null, string $type = self::COMBINE_UNION, string $modifier = '') {
+    public function __construct(Select|array|null $select = null, string $type = self::COMBINE_UNION, string $modifier = '') {
         if ($select) {
             $this->combine($select, $type, $modifier);
         }
     }
-
     /**
      * Create combine clause
      *
@@ -49,7 +45,7 @@ class Combine extends AbstractSql {
      *
      * @throws Exception\InvalidArgumentException
      */
-    public function combine($select, string $type = self::COMBINE_UNION, string $modifier = ''): self {
+    public function combine(Select|array $select, string $type = self::COMBINE_UNION, string $modifier = ''): self {
         if (is_array($select)) {
             foreach ($select as $combine) {
                 if ($combine instanceof Select) {
@@ -65,9 +61,8 @@ class Combine extends AbstractSql {
         }
 
         if (! $select instanceof Select) {
-            throw new Exception\InvalidArgumentException(
-                sprintf('$select must be a array or instance of Select, "%s" given',
-                    is_object($select) ? get_class($select) : gettype($select)));
+            throw new Exception\InvalidArgumentException(sprintf('$select must be a array or instance of Select, "%s" given',
+                is_object($select) ? get_class($select) : gettype($select)));
         }
 
         $this->combine[] = [
@@ -77,7 +72,6 @@ class Combine extends AbstractSql {
         ];
         return $this;
     }
-
     /**
      * Create union clause
      *
@@ -86,10 +80,9 @@ class Combine extends AbstractSql {
      *
      * @return self
      */
-    public function union($select, string $modifier = ''): self {
+    public function union(Select|array $select, string $modifier = ''): self {
         return $this->combine($select, self::COMBINE_UNION, $modifier);
     }
-
     /**
      * Create except clause
      *
@@ -98,10 +91,9 @@ class Combine extends AbstractSql {
      *
      * @return self
      */
-    public function except($select, string $modifier = ''): self {
+    public function except(Select|array $select, string $modifier = ''): self {
         return $this->combine($select, self::COMBINE_EXCEPT, $modifier);
     }
-
     /**
      * Create intersect clause
      *
@@ -109,10 +101,9 @@ class Combine extends AbstractSql {
      * @param string $modifier
      * @return self
      */
-    public function intersect($select, string $modifier = ''): self {
+    public function intersect(Select|array $select, string $modifier = ''): self {
         return $this->combine($select, self::COMBINE_INTERSECT, $modifier);
     }
-
     /**
      * Build sql string
      *
@@ -120,21 +111,20 @@ class Combine extends AbstractSql {
      *
      * @return string
      */
-    protected function buildSqlString(PlatformInterface $platform) {
+    protected function buildSqlString(PlatformInterface $platform): string {
         if (! $this->combine) {
             return;
         }
 
         $sql = '';
-        foreach ($this->combine as $i=>$combine) {
-            $type = $i == 0 ? '' : strtoupper(
-                $combine['type'] . ($combine['modifier'] ? ' ' . $combine['modifier'] : ''));
+        foreach ($this->combine as $i => $combine) {
+            $type = $i == 0 ? '' : strtoupper($combine['type'] .
+                ($combine['modifier'] ? ' ' . $combine['modifier'] : ''));
             $select = $this->processSubSelect($combine['select'], $platform);
             $sql .= sprintf($this->specifications[self::COMBINE], $type, $select);
         }
         return trim($sql, ' ');
     }
-
     /**
      *
      * @return self Provides a fluent interface
@@ -152,15 +142,13 @@ class Combine extends AbstractSql {
         foreach ($this->combine as $combine) {
             $combineColumns = $combine['select']->getRawState(self::COLUMNS);
             $aligned = [];
-            foreach ($allColumns as $alias=>$column) {
-                $aligned[$alias] = isset($combineColumns[$alias]) ? $combineColumns[$alias] : new Predicate\Expression(
-                    'NULL');
+            foreach ($allColumns as $alias => $column) {
+                $aligned[$alias] = isset($combineColumns[$alias]) ? $combineColumns[$alias] : new Predicate\Expression('NULL');
             }
             $combine['select']->columns($aligned, false);
         }
         return $this;
     }
-
     /**
      * Get raw state
      *
@@ -168,7 +156,7 @@ class Combine extends AbstractSql {
      *
      * @return array
      */
-    public function getRawState(?string $key = null) {
+    public function getRawState(?string $key = null): array {
         $rawState = [
             self::COMBINE => $this->combine,
             self::COLUMNS => $this->combine ? $this->combine[0]['select']->getRawState(self::COLUMNS) : []
