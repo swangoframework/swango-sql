@@ -3,7 +3,7 @@ namespace Sql;
 class Expression extends AbstractExpression {
     const PLACEHOLDER = '?';
     protected string $expression = '';
-    protected array $parameters = [];
+    protected mixed $parameters = [];
     protected array $types = [];
     /**
      *
