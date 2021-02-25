@@ -4,13 +4,13 @@ use Sql\AbstractExpression;
 
 class IsNull extends AbstractExpression implements PredicateInterface {
     protected string $specification = '%1$s IS NULL';
-    protected ?string $identifier = null;
+    protected null|string|Expression $identifier = null;
     /**
      * Constructor
      *
      * @param string $identifier
      */
-    public function __construct($identifier = null) {
+    public function __construct(null|string|Expression $identifier = null) {
         if ($identifier) {
             $this->setIdentifier($identifier);
         }
@@ -21,7 +21,7 @@ class IsNull extends AbstractExpression implements PredicateInterface {
      * @param string $identifier
      * @return self Provides a fluent interface
      */
-    public function setIdentifier(string $identifier): self {
+    public function setIdentifier(string|Expression $identifier): self {
         $this->identifier = $identifier;
         return $this;
     }
@@ -30,7 +30,7 @@ class IsNull extends AbstractExpression implements PredicateInterface {
      *
      * @return null|string
      */
-    public function getIdentifier(): ?string {
+    public function getIdentifier(): null|string|Expression {
         return $this->identifier;
     }
     /**

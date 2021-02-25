@@ -4,7 +4,7 @@ use Sql\AbstractExpression;
 
 class Between extends AbstractExpression implements PredicateInterface {
     protected string $specification = '%1$s BETWEEN %2$s AND %3$s';
-    protected ?string $identifier = null;
+    protected null|string|Expression $identifier = null;
     protected null|int|float|string $minValue = null;
     protected null|int|float|string $maxValue = null;
     /**
@@ -14,7 +14,7 @@ class Between extends AbstractExpression implements PredicateInterface {
      * @param int|float|string $minValue
      * @param int|float|string $maxValue
      */
-    public function __construct(?string $identifier = null, int|float|string $minValue = null, int|float|string $maxValue = null) {
+    public function __construct(null|string|Expression $identifier = null, null|int|float|string $minValue = null, null|int|float|string $maxValue = null) {
         if ($identifier) {
             $this->setIdentifier($identifier);
         }
@@ -31,7 +31,7 @@ class Between extends AbstractExpression implements PredicateInterface {
      * @param string $identifier
      * @return self Provides a fluent interface
      */
-    public function setIdentifier(string $identifier) {
+    public function setIdentifier(string|Expression $identifier): self {
         $this->identifier = $identifier;
         return $this;
     }
@@ -40,7 +40,7 @@ class Between extends AbstractExpression implements PredicateInterface {
      *
      * @return null|string
      */
-    public function getIdentifier(): ?string {
+    public function getIdentifier(): null|string|Expression {
         return $this->identifier;
     }
     /**

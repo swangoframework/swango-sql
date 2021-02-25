@@ -25,23 +25,23 @@ class Operator extends AbstractExpression implements PredicateInterface {
         self::TYPE_IDENTIFIER,
         self::TYPE_VALUE
     ];
-    protected int|float|bool|string $left;
-    protected int|float|bool|string $right;
+    protected mixed $left;
+    protected mixed $right;
     protected string $leftType = self::TYPE_IDENTIFIER;
     protected string $rightType = self::TYPE_VALUE;
     protected string $operator = self::OPERATOR_EQUAL_TO;
     /**
      * Constructor
      *
-     * @param int|float|bool|string $left
+     * @param int|float|bool|string|\Sql\Expression $left
      * @param string $operator
-     * @param int|float|bool|string $right
+     * @param int|float|bool|string|\Sql\Expression $right
      * @param string $leftType
      *            TYPE_IDENTIFIER or TYPE_VALUE by default TYPE_IDENTIFIER {@see allowedTypes}
      * @param string $rightType
      *            TYPE_IDENTIFIER or TYPE_VALUE by default TYPE_VALUE {@see allowedTypes}
      */
-    public function __construct(int|float|bool|string|null $left = null, string $operator = self::OPERATOR_EQUAL_TO, int|float|bool|string|null $right = null, string $leftType = self::TYPE_IDENTIFIER, string $rightType = self::TYPE_VALUE) {
+    public function __construct(mixed $left = null, string $operator = self::OPERATOR_EQUAL_TO, mixed $right = null, string $leftType = self::TYPE_IDENTIFIER, string $rightType = self::TYPE_VALUE) {
         if ($left !== null) {
             $this->setLeft($left);
         }
@@ -65,11 +65,11 @@ class Operator extends AbstractExpression implements PredicateInterface {
     /**
      * Set left side of operator
      *
-     * @param int|float|bool|string $left
+     * @param int|float|bool|string|\Sql\Expression $left
      *
      * @return self Provides a fluent interface
      */
-    public function setLeft(int|float|bool|string $left): self {
+    public function setLeft(mixed $left): self {
         $this->left = $left;
 
         if (is_array($left)) {
@@ -82,9 +82,9 @@ class Operator extends AbstractExpression implements PredicateInterface {
     /**
      * Get left side of operator
      *
-     * @return int|float|bool|string
+     * @return int|float|bool|string|\Sql\Expression
      */
-    public function getLeft(): int|float|bool|string {
+    public function getLeft(): mixed {
         return $this->left;
     }
     /**
@@ -137,11 +137,11 @@ class Operator extends AbstractExpression implements PredicateInterface {
     /**
      * Set right side of operator
      *
-     * @param int|float|bool|string $right
+     * @param mixed $right
      *
      * @return self Provides a fluent interface
      */
-    public function setRight(int|float|bool|string $right): self {
+    public function setRight(mixed $right): self {
         $this->right = $right;
 
         if (is_array($right)) {
@@ -154,9 +154,9 @@ class Operator extends AbstractExpression implements PredicateInterface {
     /**
      * Get right side of operator
      *
-     * @return int|float|bool|string
+     * @return mixed
      */
-    public function getRight(): int|float|bool|string {
+    public function getRight(): mixed {
         return $this->right;
     }
     /**

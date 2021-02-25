@@ -55,15 +55,15 @@ class Predicate extends PredicateSet {
      *
      * Utilizes Operator predicate
      *
-     * @param int|float|bool|string $left
-     * @param int|float|bool|string $right
+     * @param mixed $left
+     * @param mixed $right
      * @param string $leftType
      *            TYPE_IDENTIFIER or TYPE_VALUE by default TYPE_IDENTIFIER {@see allowedTypes}
      * @param string $rightType
      *            TYPE_IDENTIFIER or TYPE_VALUE by default TYPE_VALUE {@see allowedTypes}
      * @return self Provides a fluent interface
      */
-    public function equalTo(int|float|bool|string $left, int|float|bool|string $right, string $leftType = self::TYPE_IDENTIFIER, string $rightType = self::TYPE_VALUE): self {
+    public function equalTo(mixed $left, mixed $right, string $leftType = self::TYPE_IDENTIFIER, string $rightType = self::TYPE_VALUE): self {
         $this->addPredicate(new Operator($left, Operator::OPERATOR_EQUAL_TO, $right, $leftType, $rightType),
             $this->nextPredicateCombineOperator ?? $this->defaultCombination);
         $this->nextPredicateCombineOperator = null;
@@ -75,15 +75,15 @@ class Predicate extends PredicateSet {
      *
      * Utilizes Operator predicate
      *
-     * @param int|float|bool|string $left
-     * @param int|float|bool|string $right
+     * @param mixed $left
+     * @param mixed $right
      * @param string $leftType
      *            TYPE_IDENTIFIER or TYPE_VALUE by default TYPE_IDENTIFIER {@see allowedTypes}
      * @param string $rightType
      *            TYPE_IDENTIFIER or TYPE_VALUE by default TYPE_VALUE {@see allowedTypes}
      * @return self Provides a fluent interface
      */
-    public function notEqualTo(int|float|bool|string $left, int|float|bool|string $right, string $leftType = self::TYPE_IDENTIFIER, string $rightType = self::TYPE_VALUE): self {
+    public function notEqualTo(mixed $left, mixed $right, string $leftType = self::TYPE_IDENTIFIER, string $rightType = self::TYPE_VALUE): self {
         $this->addPredicate(new Operator($left, Operator::OPERATOR_NOT_EQUAL_TO, $right, $leftType, $rightType),
             $this->nextPredicateCombineOperator ?? $this->defaultCombination);
         $this->nextPredicateCombineOperator = null;
@@ -95,15 +95,15 @@ class Predicate extends PredicateSet {
      *
      * Utilizes Operator predicate
      *
-     * @param int|float|bool|string $left
-     * @param int|float|bool|string $right
+     * @param mixed $left
+     * @param mixed $right
      * @param string $leftType
      *            TYPE_IDENTIFIER or TYPE_VALUE by default TYPE_IDENTIFIER {@see allowedTypes}
      * @param string $rightType
      *            TYPE_IDENTIFIER or TYPE_VALUE by default TYPE_VALUE {@see allowedTypes}
      * @return self Provides a fluent interface
      */
-    public function lessThan(int|float|bool|string $left, int|float|bool|string $right, string $leftType = self::TYPE_IDENTIFIER, string $rightType = self::TYPE_VALUE): self {
+    public function lessThan(mixed $left, mixed $right, string $leftType = self::TYPE_IDENTIFIER, string $rightType = self::TYPE_VALUE): self {
         $this->addPredicate(new Operator($left, Operator::OPERATOR_LESS_THAN, $right, $leftType, $rightType),
             $this->nextPredicateCombineOperator ?? $this->defaultCombination);
         $this->nextPredicateCombineOperator = null;
@@ -115,15 +115,15 @@ class Predicate extends PredicateSet {
      *
      * Utilizes Operator predicate
      *
-     * @param int|float|bool|string $left
-     * @param int|float|bool|string $right
+     * @param mixed $left
+     * @param mixed $right
      * @param string $leftType
      *            TYPE_IDENTIFIER or TYPE_VALUE by default TYPE_IDENTIFIER {@see allowedTypes}
      * @param string $rightType
      *            TYPE_IDENTIFIER or TYPE_VALUE by default TYPE_VALUE {@see allowedTypes}
      * @return self Provides a fluent interface
      */
-    public function greaterThan(int|float|bool|string $left, int|float|bool|string $right, string $leftType = self::TYPE_IDENTIFIER, string $rightType = self::TYPE_VALUE): self {
+    public function greaterThan(mixed $left, mixed $right, string $leftType = self::TYPE_IDENTIFIER, string $rightType = self::TYPE_VALUE): self {
         $this->addPredicate(new Operator($left, Operator::OPERATOR_GREATER_THAN, $right, $leftType, $rightType),
             $this->nextPredicateCombineOperator ?? $this->defaultCombination);
         $this->nextPredicateCombineOperator = null;
@@ -135,15 +135,15 @@ class Predicate extends PredicateSet {
      *
      * Utilizes Operator predicate
      *
-     * @param int|float|bool|string $left
-     * @param int|float|bool|string $right
+     * @param mixed $left
+     * @param mixed $right
      * @param string $leftType
      *            TYPE_IDENTIFIER or TYPE_VALUE by default TYPE_IDENTIFIER {@see allowedTypes}
      * @param string $rightType
      *            TYPE_IDENTIFIER or TYPE_VALUE by default TYPE_VALUE {@see allowedTypes}
      * @return self Provides a fluent interface
      */
-    public function lessThanOrEqualTo(int|float|bool|string $left, int|float|bool|string $right, string $leftType = self::TYPE_IDENTIFIER, string $rightType = self::TYPE_VALUE): self {
+    public function lessThanOrEqualTo(mixed $left, mixed $right, string $leftType = self::TYPE_IDENTIFIER, string $rightType = self::TYPE_VALUE): self {
         $this->addPredicate(new Operator($left, Operator::OPERATOR_LESS_THAN_OR_EQUAL_TO, $right, $leftType,
             $rightType), $this->nextPredicateCombineOperator ?? $this->defaultCombination);
         $this->nextPredicateCombineOperator = null;
@@ -155,15 +155,15 @@ class Predicate extends PredicateSet {
      *
      * Utilizes Operator predicate
      *
-     * @param int|float|bool|string $left
-     * @param int|float|bool|string $right
+     * @param mixed $left
+     * @param mixed $right
      * @param string $leftType
      *            TYPE_IDENTIFIER or TYPE_VALUE by default TYPE_IDENTIFIER {@see allowedTypes}
      * @param string $rightType
      *            TYPE_IDENTIFIER or TYPE_VALUE by default TYPE_VALUE {@see allowedTypes}
      * @return self Provides a fluent interface
      */
-    public function greaterThanOrEqualTo(int|float|bool|string $left, int|float|bool|string $right, string $leftType = self::TYPE_IDENTIFIER, string $rightType = self::TYPE_VALUE): self {
+    public function greaterThanOrEqualTo(mixed $left, mixed $right, string $leftType = self::TYPE_IDENTIFIER, string $rightType = self::TYPE_VALUE): self {
         $this->addPredicate(new Operator($left, Operator::OPERATOR_GREATER_THAN_OR_EQUAL_TO, $right, $leftType,
             $rightType), $this->nextPredicateCombineOperator ?? $this->defaultCombination);
         $this->nextPredicateCombineOperator = null;

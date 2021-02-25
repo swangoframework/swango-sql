@@ -4,14 +4,14 @@ use Sql\AbstractExpression;
 
 class Like extends AbstractExpression implements PredicateInterface {
     protected string $specification = '%1$s LIKE %2$s';
-    protected string $identifier = '';
+    protected string|Expression $identifier = '';
     protected string $like = '';
     /**
      *
      * @param string $identifier
      * @param string $like
      */
-    public function __construct(?string $identifier = null, ?string $like = null) {
+    public function __construct(null|string|Expression $identifier = null, ?string $like = null) {
         if ($identifier) {
             $this->setIdentifier($identifier);
         }
@@ -24,15 +24,11 @@ class Like extends AbstractExpression implements PredicateInterface {
      * @param string $identifier
      * @return self Provides a fluent interface
      */
-    public function setIdentifier(string $identifier): self {
+    public function setIdentifier(string|Expression $identifier): self {
         $this->identifier = $identifier;
         return $this;
     }
-    /**
-     *
-     * @return string
-     */
-    public function getIdentifier(): string {
+    public function getIdentifier(): string|Expression {
         return $this->identifier;
     }
     /**

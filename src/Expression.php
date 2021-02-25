@@ -58,7 +58,7 @@ class Expression extends AbstractExpression {
      *
      * @return array
      */
-    public function getParameters(): array {
+    public function getParameters(): mixed {
         return $this->parameters;
     }
     /**
