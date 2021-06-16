@@ -28,8 +28,6 @@ abstract class AbstractSql implements SqlInterface {
      * @return string
      */
     protected function buildSqlString(PlatformInterface $platform): string {
-        $this->localizeVariables();
-
         $sqls = [];
         $parameters = [];
 
@@ -348,15 +346,5 @@ abstract class AbstractSql implements SqlInterface {
             $table = $platform->quoteIdentifier($schema) . $platform->getIdentifierSeparator() . $table;
         }
         return $table;
-    }
-    /**
-     * Copy variables from the subject into the local properties
-     */
-    protected function localizeVariables(): void {
-        if (isset($this->subject)) {
-            foreach (get_object_vars($this->subject) as $name => $value) {
-                $this->{$name} = $value;
-            }
-        }
     }
 }
