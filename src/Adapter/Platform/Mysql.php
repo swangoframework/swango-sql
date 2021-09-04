@@ -76,14 +76,16 @@ class Mysql extends AbstractPlatform {
      *
      */
     public function quoteValue(mixed $value): string {
-        if (method_exists($this->resource, 'escape')) {
-            return '\'' . $this->resource->escape($value) . '\'';
-        }
-        if ($this->resource instanceof \mysqli) {
-            return '\'' . $this->resource->real_escape_string($value) . '\'';
-        }
-        if ($this->resource instanceof \PDO) {
-            return $this->resource->quote($value);
+        if (isset($this->resource)) {
+            if (method_exists($this->resource, 'escape')) {
+                return '\'' . $this->resource->escape($value) . '\'';
+            }
+            if ($this->resource instanceof \mysqli) {
+                return '\'' . $this->resource->real_escape_string($value) . '\'';
+            }
+            if ($this->resource instanceof \PDO) {
+                return $this->resource->quote($value);
+            }
         }
         return parent::quoteValue($value);
     }
@@ -93,14 +95,16 @@ class Mysql extends AbstractPlatform {
      *
      */
     public function quoteTrustedValue(string $value): string {
-        if (method_exists($this->resource, 'escape')) {
-            return '\'' . $this->resource->escape($value) . '\'';
-        }
-        if ($this->resource instanceof \mysqli) {
-            return '\'' . $this->resource->real_escape_string($value) . '\'';
-        }
-        if ($this->resource instanceof \PDO) {
-            return $this->resource->quote($value);
+        if (isset($this->resource)) {
+            if (method_exists($this->resource, 'escape')) {
+                return '\'' . $this->resource->escape($value) . '\'';
+            }
+            if ($this->resource instanceof \mysqli) {
+                return '\'' . $this->resource->real_escape_string($value) . '\'';
+            }
+            if ($this->resource instanceof \PDO) {
+                return $this->resource->quote($value);
+            }
         }
         return parent::quoteTrustedValue($value);
     }
