@@ -718,11 +718,11 @@ class Select extends AbstractSql {
     }
     /**
      *
-     * @param string|TableIdentifier|Select $table
+     * @param array|string|TableIdentifier|Select $table
      * @param PlatformInterface $platform
      * @return string|array
      */
-    protected function resolveTable(string|TableIdentifier|Select $table, PlatformInterface $platform): string|array {
+    protected function resolveTable(array|string|TableIdentifier|Select $table, PlatformInterface $platform): string|array {
         $alias = null;
 
         if (is_array($table)) {
