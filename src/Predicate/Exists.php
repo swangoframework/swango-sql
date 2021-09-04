@@ -32,10 +32,10 @@ class Exists extends AbstractExpression implements PredicateInterface {
             if (! empty($valueParameter)) {
                 $valueParameter1 = current($valueParameter);
                 $valueParameterArray = is_array($valueParameter1) ? $valueParameter1 : $valueParameter;
+                $exists = new Expression($exists, $valueParameterArray);
             } else {
-                $valueParameterArray = null;
+                $exists = new Expression($exists);
             }
-            $exists = new Expression($exists, $valueParameterArray);
         } elseif (! $exists instanceof Select && ! $exists instanceof Expression) {
             throw new Exception\InvalidArgumentException('$exists must be either an string, a Sql\Select object or a Sql\Expression object, ' .
                 gettype($exists) . ' given');
