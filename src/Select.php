@@ -165,10 +165,6 @@ class Select extends AbstractSql {
             throw new Exception\InvalidArgumentException('Since this object was created with a table and/or schema in the constructor, it is read only.');
         }
 
-        if (! is_string($table) && ! is_array($table) && ! $table instanceof TableIdentifier) {
-            throw new Exception\InvalidArgumentException('$table must be a string, array or an instance of TableIdentifier');
-        }
-
         if (is_array($table) && (! is_string(key($table)) || count($table) !== 1)) {
             throw new Exception\InvalidArgumentException('from() expects $table as an array is a single element associative array');
         }
@@ -178,16 +174,12 @@ class Select extends AbstractSql {
     }
     /**
      *
-     * @param string|Expression $quantifier
+     * @param string|ExpressionInterface $quantifier
      *            DISTINCT|ALL
      * @return self Provides a fluent interface
      * @throws Exception\InvalidArgumentException
      */
-    public function quantifier(string|Expression $quantifier): self {
-        if (! is_string($quantifier) && ! $quantifier instanceof ExpressionInterface) {
-            throw new Exception\InvalidArgumentException('Quantifier must be one of DISTINCT, ALL, or some platform specific object implementing ' .
-                'ExpressionInterface');
-        }
+    public function quantifier(string|ExpressionInterface $quantifier): self {
         $this->quantifier = $quantifier;
         return $this;
     }
@@ -225,7 +217,9 @@ class Select extends AbstractSql {
      * @return self Provides a fluent interface
      * @throws Exception\InvalidArgumentException
      */
-    public function join(string|array|TableIdentifier $name, string|Predicate\Expression $on, string|array $columns = self::SQL_STAR, string $type = self::JOIN_INNER): self {
+    public function join(string|array|TableIdentifier $name, string|Predicate\Expression $on,
+                         string|array                 $columns = self::SQL_STAR,
+                         string                       $type = self::JOIN_INNER): self {
         $this->joins->join($name, $on, $columns, $type);
 
         return $this;
@@ -239,7 +233,8 @@ class Select extends AbstractSql {
      * @return self Provides a fluent interface
      * @throws Exception\InvalidArgumentException
      */
-    public function where(Where|\Closure|string|array|Predicate\PredicateInterface $predicate, string $combination = Predicate\PredicateSet::OP_AND): self {
+    public function where(Where|\Closure|string|array|Predicate\PredicateInterface $predicate,
+                          string                                                   $combination = Predicate\PredicateSet::OP_AND): self {
         if ($predicate instanceof Where) {
             $this->where = $predicate;
         } else {
@@ -270,7 +265,8 @@ class Select extends AbstractSql {
      *            One of the OP_* constants from Predicate\PredicateSet
      * @return self Provides a fluent interface
      */
-    public function having(Where|\Closure|string|array $predicate, string $combination = Predicate\PredicateSet::OP_AND): self {
+    public function having(Where|\Closure|string|array $predicate,
+                           string                      $combination = Predicate\PredicateSet::OP_AND): self {
         if ($predicate instanceof Having) {
             $this->having = $predicate;
         } else {
@@ -722,7 +718,8 @@ class Select extends AbstractSql {
      * @param PlatformInterface $platform
      * @return string|array
      */
-    protected function resolveTable(array|string|TableIdentifier|Select $table, PlatformInterface $platform): string|array {
+    protected function resolveTable(array|string|TableIdentifier|Select $table,
+                                    PlatformInterface                   $platform): string|array {
         $alias = null;
 
         if (is_array($table)) {

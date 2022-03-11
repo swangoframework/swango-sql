@@ -1,22 +1,22 @@
 {
-	"name" : "swango/sql",
-	"license" : "Apache-2.0",
-	"keywords" : [
-		"php",
-		"swoole",
-		"sql"
-	],
-	"require" : {
-		"php" : ">=8.0",
-		"swlib/http" : "^1.0.5"
-	},
-	"autoload" : {
-		"psr-4" : {
-			"Sql\\" : "src"
-		}
-	},
-	"config" : {
-		"optimize-autoloader" : true,
-		"sort-packages" : true
-	}
+    "name" : "swango/sql",
+    "license" : "Apache-2.0",
+    "keywords" : [
+        "php",
+        "swoole",
+        "sql"
+    ],
+    "require" : {
+        "php" : ">=8.0",
+        "swlib/http" : ">=1.0.5"
+    },
+    "autoload" : {
+        "psr-4" : {
+            "Sql\\" : "src"
+        }
+    },
+    "config" : {
+        "optimize-autoloader" : true,
+        "sort-packages" : true
+    }
 }

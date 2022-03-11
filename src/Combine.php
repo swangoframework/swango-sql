@@ -29,7 +29,8 @@ class Combine extends AbstractSql {
      * @param string $type
      * @param string $modifier
      */
-    public function __construct(Select|array|null $select = null, string $type = self::COMBINE_UNION, string $modifier = '') {
+    public function __construct(Select|array|null $select = null, string $type = self::COMBINE_UNION,
+                                string            $modifier = '') {
         if ($select) {
             $this->combine($select, $type, $modifier);
         }
@@ -58,11 +59,6 @@ class Combine extends AbstractSql {
                     isset($combine[2]) ? $combine[2] : $modifier);
             }
             return $this;
-        }
-
-        if (! $select instanceof Select) {
-            throw new Exception\InvalidArgumentException(sprintf('$select must be a array or instance of Select, "%s" given',
-                is_object($select) ? get_class($select) : gettype($select)));
         }
 
         $this->combine[] = [

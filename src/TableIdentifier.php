@@ -12,19 +12,10 @@ class TableIdentifier {
      * @param null|string $schema
      */
     public function __construct(string $table, ?string $schema = null) {
-        if (! (is_string($table) || is_callable([
-                $table,
-                '__toString'
-            ]))) {
-            throw new Exception\InvalidArgumentException(sprintf('$table must be a valid table name, parameter of type %s given',
-                is_object($table) ? get_class($table) : gettype($table)));
-        }
-
-        $this->table = (string)$table;
-
-        if ('' === $this->table) {
+        if ('' === $table) {
             throw new Exception\InvalidArgumentException("$table must be a valid table name, empty string given");
         }
+        $this->table = $table;
 
         if (null === $schema) {
             $this->schema = null;
