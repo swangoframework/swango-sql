@@ -10,13 +10,15 @@ class Expression extends AbstractExpression {
      * @param string $expression
      * @param string|array $parameters
      */
-    public function __construct(string $expression = '', string|array|null $parameters = null) {
+    public function __construct(string $expression = '', mixed ...$parameters) {
         if ($expression !== '') {
             $this->setExpression($expression);
         }
 
-        if ($parameters) {
-            $this->setParameters($parameters);
+        if (! empty($parameters)) {
+            $valueParameter1 = current($parameters);
+            $valueParameterArray = is_array($valueParameter1) ? $valueParameter1 : $parameters;
+            $this->setParameters($valueParameterArray);
         }
     }
     /**
