@@ -317,7 +317,13 @@ abstract class AbstractSql implements SqlInterface {
         if ($column === null) {
             return 'NULL';
         }
+        if ($column instanceof \BackedEnum) {
+            $column = $column->value;
+        } elseif ($column instanceof \Swango\Model\IdIndexedModel) {
+            $column = $column->getId();
+        }
         $column = (string)$column;
+
         return $isIdentifier ? $fromTable .
             $platform->quoteIdentifierInFragment($column) : $platform->quoteValue($column);
     }

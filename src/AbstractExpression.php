@@ -46,8 +46,16 @@ abstract class AbstractExpression implements ExpressionInterface {
             return $this->buildNormalizedArgument($key, $value);
         }
 
-        throw new Exception\InvalidArgumentException(sprintf('$argument should be %s or %s or %s or %s or %s, "%s" given',
-            'null', 'scalar', 'array', 'Sql\ExpressionInterface', 'Sql\Sql\SqlInterface',
+        if ($argument instanceof \BackedEnum) {
+            return $this->buildNormalizedArgument($argument->value, $defaultType);
+        }
+
+        if ($argument instanceof \Swango\Model\IdIndexedModel) {
+            return $this->buildNormalizedArgument($argument->getId(), $defaultType);
+        }
+
+        throw new Exception\InvalidArgumentException(sprintf('$argument should be %s or %s or %s or %s or %s or %s or %s, "%s" given',
+            'null', 'scalar', 'array', 'Sql\ExpressionInterface', 'Sql\Sql\SqlInterface', 'BackedEnum', 'Swango\Model\IdIndexedModel',
             is_object($argument) ? get_class($argument) : gettype($argument)));
     }
     /**
