@@ -3,80 +3,25 @@ namespace Sql;
 use Sql\Adapter\Platform\PlatformInterface;
 use function Swlib\Http\stream_for;
 
-class InsertMulti extends AbstractSql implements \countable {
+class InsertMulti extends ReplaceMulti implements \countable {
     const SPECIFICATION_INSERT = 'insert';
     protected array $specifications = [
         self::SPECIFICATION_INSERT => 'INSERT INTO %1$s (%2$s) VALUES (%3$s)'
     ];
-    protected string|TableIdentifier|null $table = null;
-    protected int $columns_count = 0;
-    protected \SplFixedArray $columns;
-    protected \SplQueue $values;
-    /**
-     * Constructor
-     *
-     * @param null|string|TableIdentifier $table
-     */
-    public function __construct(null|string|TableIdentifier $table = null) {
-        if ($table) {
-            $this->into($table);
-        }
-        $this->values = new \SplQueue();
-    }
-    public function count(): int {
-        return count($this->values);
-    }
-    /**
-     * Create INTO clause
-     *
-     * @param string|TableIdentifier $table
-     * @return self Provides a fluent interface
-     */
-    public function into(string|TableIdentifier $table): self {
-        $this->table = $table;
+    protected bool $ignore = false;
+    protected Expression|null $on_duplicate_key_update = null;
+    public function withInsertIgnore(bool $ignore): self {
+        $this->ignore = $ignore;
         return $this;
     }
-    /**
-     * Specify columns
-     *
-     * @param array $columns
-     * @return self Provides a fluent interface
-     */
-    public function columns(string ...$columns): self {
-        if (! $this->values->isEmpty()) {
-            throw new Exception\RuntimeException('Must not change columns after add value');
+    public function onDuplicateKeyUpdate(string|Expression|null $on_duplicate_key_update,
+                                         mixed                  ...$parameters): self {
+        if (is_string($on_duplicate_key_update)) {
+            $this->on_duplicate_key_update = new Expression($on_duplicate_key_update, ...$parameters);
+        } else {
+            $this->on_duplicate_key_update = $on_duplicate_key_update;
         }
-        $this->columns_count = count($columns);
-        $this->columns = new \SplFixedArray($this->columns_count);
-        foreach ($columns as $i => $key)
-            $this->columns[$i] = $key;
         return $this;
-    }
-    public function addValue(array $values): self {
-        if ($this->columns === null) {
-            throw new Exception\RuntimeException('Must set columns before add value');
-        }
-        $container = new \SplFixedArray($this->columns_count);
-        for ($i = 0; $i < $this->columns_count; ++$i) {
-            $key = $this->columns[$i];
-            $container[$i] = array_key_exists($key, $values) ? $values[$key] : null;
-        }
-        $this->values->enqueue($container);
-        return $this;
-    }
-    /**
-     * Get raw state
-     *
-     * @param string $key
-     * @return mixed
-     */
-    public function getRawState(string $key = null): mixed {
-        $rawState = [
-            'table' => $this->table,
-            'columns' => $this->columns,
-            'values' => $this->values
-        ];
-        return (isset($key) && array_key_exists($key, $rawState)) ? $rawState[$key] : $rawState;
     }
     protected function processInsert(PlatformInterface $platform): string {
         if ($this->columns === null || $this->values->isEmpty()) {
@@ -89,7 +34,11 @@ class InsertMulti extends AbstractSql implements \countable {
             $columns[] = $platform->quoteIdentifier($this->columns[$i]);
 
         $ret = stream_for('');
-        $ret->write('INSERT INTO ');
+        if ($this->ignore) {
+            $ret->write('INSERT IGNORE INTO ');
+        } else {
+            $ret->write('INSERT INTO ');
+        }
         $ret->write($platform->shoueldQuoteOtherTable() ? $this->resolveTable($this->table, $platform) : $this->table);
         $ret->write(' (' . implode(', ', $columns) . ') VALUES ');
 
@@ -114,6 +63,10 @@ class InsertMulti extends AbstractSql implements \countable {
             if ($this->values->isEmpty()) {
                 break;
             }
+        }
+        if (isset($this->on_duplicate_key_update)) {
+            $ret->write(' ON DUPLICATE KEY UPDATE ');
+            $ret->write($this->processExpression($this->on_duplicate_key_update, $platform));
         }
         return $ret->__toString();
     }
