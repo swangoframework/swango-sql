@@ -234,6 +234,17 @@ class Predicate extends PredicateSet {
         return $this;
     }
     /**
+     * @param string|Select|Expression|PredicateInterface|null $condition
+     * @param mixed ...$valueParameter
+     * @return IfExpression
+     */
+    public function ifExpression(null|string|Select|Expression|PredicateInterface $condition,
+                                 mixed                                            ...$valueParameter): IfExpression {
+        $if_expression = new IfExpression($condition, ...$valueParameter);
+        $this->addPredicate($if_expression);
+        return $if_expression;
+    }
+    /**
      * Create an expression, with parameter placeholders
      *
      * @param
