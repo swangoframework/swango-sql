@@ -56,22 +56,11 @@ class Exists extends AbstractExpression implements PredicateInterface {
      */
     public function getExpressionData(): array {
         $exists = $this->getExists();
-        $replacements = [];
-        $identifierSpecFragment = '%s';
-
-        $specification = vsprintf($exists instanceof Select ? $this->specification : str_replace('%s', '(%s)',
-            $this->specification), [
-            $identifierSpecFragment,
-            '%s'
-        ]);
-        $replacements[] = $exists;
-        $types[] = self::TYPE_VALUE;
-
         return [
             [
-                $specification,
-                $replacements,
-                $types
+                $exists instanceof Select ? $this->specification : $this->valueSpecSpecification,
+                [$exists],
+                [self::TYPE_VALUE]
             ]
         ];
     }
