@@ -60,18 +60,17 @@ abstract class AbstractSql implements SqlInterface {
     }
     /**
      *
-     * @staticvar int $runtimeExpressionPrefix
      * @param ExpressionInterface $expression
      * @param PlatformInterface $platform
      * @param null|string $namedParameterPrefix
      * @return string
      * @throws Exception\RuntimeException
      */
-    protected function processExpression(ExpressionInterface $expression, PlatformInterface $platform, ?string $namedParameterPrefix = null): string {
+    protected function processExpression(ExpressionInterface $expression,
+                                         PlatformInterface   $platform,
+                                         ?string             $namedParameterPrefix = null): string {
         $namedParameterPrefix = ! $namedParameterPrefix ? $namedParameterPrefix : $this->processInfo['paramPrefix'] .
             $namedParameterPrefix;
-        // static counter for the number of times this method was invoked across the PHP runtime
-        static $runtimeExpressionPrefix = 0;
 
         $namedParameterPrefix = preg_replace('/\s/', '__', $namedParameterPrefix);
 
@@ -80,57 +79,46 @@ abstract class AbstractSql implements SqlInterface {
         // initialize variables
         $parts = $expression->getExpressionData();
 
-        if (! isset($this->instanceParameterIndex[$namedParameterPrefix])) {
-            $this->instanceParameterIndex[$namedParameterPrefix] = 1;
-        }
+        $this->instanceParameterIndex[$namedParameterPrefix] ??= 1;
 
         $expressionParamIndex = &$this->instanceParameterIndex[$namedParameterPrefix];
 
         foreach ($parts as $part) {
-            // #7407: use $expression->getExpression() to get the unescaped
-            // version of the expression
-            if (is_string($part) && $expression instanceof Expression) {
-                $sql .= $expression->getExpression();
-                continue;
-            }
-
-            // If it is a string, simply tack it onto the return sql
+            //
+            // If it is a string, use $expression->getExpression() to get the unescaped, or simply tack it onto the return sql
             // "specification" string
             if (is_string($part)) {
-                $sql .= $part;
+                $sql .= $expression instanceof Expression ? $expression->getExpression() : $part;
                 continue;
             }
 
             if (! is_array($part)) {
-                throw new Exception\RuntimeException('Elements returned from getExpressionData() array must be a string or array.');
+                throw new Exception\RuntimeException('Elements returned from getExpressionData() array must be a string or array.'
+                );
             }
 
-            // Process values and types (the middle and last position of the
-            // expression data)
+            // Process values and types (the middle and last position of the expression data)
             $values = $part[1];
-            $types = isset($part[2]) ? $part[2] : [];
-            foreach ($values as $vIndex => $value) {
-                if (! isset($types[$vIndex])) {
-                    continue;
-                }
-                $type = $types[$vIndex];
-                if ($value instanceof Select) {
-                    // process sub-select
-                    $values[$vIndex] = '(' . $this->processSubSelect($value, $platform) . ')';
-                } elseif ($value instanceof ExpressionInterface) {
-                    // recursive call to satisfy nested expressions
-                    $values[$vIndex] = $this->processExpression($value, $platform,
-                        $namedParameterPrefix . $vIndex . 'subpart');
-                } elseif ($type == ExpressionInterface::TYPE_IDENTIFIER) {
-                    $values[$vIndex] = $platform->quoteIdentifierInFragment($value);
-                } elseif ($type == ExpressionInterface::TYPE_VALUE) {
-                    // if not a preparable statement, simply quote the value and move on
-                    $values[$vIndex] = $platform->quoteValue($value);
-                } elseif ($type == ExpressionInterface::TYPE_LITERAL) {
-                    $values[$vIndex] = $value;
-                }
+            if (! empty($part[2])) {
+                $types = $part[2];
+                foreach ($values as $vIndex => &$value)
+                    if (isset($types[$vIndex])) {
+                        $value = match (true) {
+                            $value instanceof Select => '(' . $this->processSubSelect($value, $platform) . ')',
+                            $value instanceof ExpressionInterface => $this->processExpression($value,
+                                $platform,
+                                $namedParameterPrefix . $vIndex . 'subpart'
+                            ),
+                            default => match ($types[$vIndex]) {
+                                ExpressionInterface::TYPE_IDENTIFIER => $platform->quoteIdentifierInFragment($value),
+                                ExpressionInterface::TYPE_VALUE => $platform->quoteValue($value),
+                                ExpressionInterface::TYPE_LITERAL => $value,
+                                default => $value
+                            }
+                        };
+                    }
+                unset($value);
             }
-
             // After looping the values, interpolate them into the sql string
             // (they might be placeholder names, or values)
             $sql .= vsprintf($part[0], $values);
@@ -163,7 +151,8 @@ abstract class AbstractSql implements SqlInterface {
         }
 
         if (! isset($specificationString)) {
-            throw new Exception\RuntimeException('A number of parameters was found that is not supported by this specification');
+            throw new Exception\RuntimeException('A number of parameters was found that is not supported by this specification'
+            );
         }
 
         $topParameters = [];
@@ -179,7 +168,9 @@ abstract class AbstractSql implements SqlInterface {
 
                     if (! isset($paramSpecs[$position][$ppCount])) {
                         throw new Exception\RuntimeException(sprintf('A number of parameters (%d) was found that is not supported by this specification',
-                            $ppCount));
+                                $ppCount
+                            )
+                        );
                     }
                     if (is_string($multiParamsForPosition)) {
                         $multiParamValues[] = sprintf($paramSpecs[$position][$ppCount], $multiParamsForPosition);
@@ -192,7 +183,9 @@ abstract class AbstractSql implements SqlInterface {
                 $ppCount = count($paramsForPosition);
                 if (! isset($paramSpecs[$position][$ppCount])) {
                     throw new Exception\RuntimeException(sprintf('A number of parameters (%d) was found that is not supported by this specification',
-                        $ppCount));
+                            $ppCount
+                        )
+                    );
                 }
                 $topParameters[] = vsprintf($paramSpecs[$position][$ppCount], $paramsForPosition);
             } else {
@@ -245,16 +238,17 @@ abstract class AbstractSql implements SqlInterface {
                         $platform->getIdentifierSeparator() : '') . $platform->quoteIdentifier($joinName[0]);
             } elseif ($joinName instanceof Select) {
                 $joinName = '(' . $this->processSubSelect($joinName, $platform) . ')';
-            } elseif (is_string($joinName) || (is_object($joinName) && is_callable([
-                        $joinName,
-                        '__toString'
-                    ]))) {
+            } elseif (is_string($joinName) || (is_object($joinName) && method_exists($joinName, '__toString'))) {
                 if ($platform->shoueldQuoteOtherTable()) {
                     $joinName = $platform->quoteIdentifier($joinName);
+                } else {
+                    $joinName = (string)$joinName;
                 }
             } else {
                 throw new Exception\InvalidArgumentException(sprintf('Join name expected to be Expression|TableIdentifier|Select|string, "%s" given',
-                    gettype($joinName)));
+                        gettype($joinName)
+                    )
+                );
             }
 
             $joinSpecArgArray[$j] = [
@@ -293,7 +287,9 @@ abstract class AbstractSql implements SqlInterface {
      * @param null|string $namedParameterPrefix
      * @return string
      */
-    protected function resolveColumnValue(mixed $column, PlatformInterface $platform, ?string $namedParameterPrefix = null): string {
+    protected function resolveColumnValue(mixed             $column,
+                                          PlatformInterface $platform,
+                                          ?string           $namedParameterPrefix = null): string {
         $namedParameterPrefix = ! $namedParameterPrefix ? $namedParameterPrefix : $this->processInfo['paramPrefix'] .
             $namedParameterPrefix;
         $isIdentifier = false;
@@ -324,8 +320,7 @@ abstract class AbstractSql implements SqlInterface {
         }
         $column = (string)$column;
 
-        return $isIdentifier ? $fromTable .
-            $platform->quoteIdentifierInFragment($column) : $platform->quoteValue($column);
+        return $isIdentifier ? $fromTable . $platform->quoteIdentifierInFragment($column) : $platform->quoteValue($column);
     }
     /**
      *

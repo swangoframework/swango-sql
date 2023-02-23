@@ -61,8 +61,7 @@ class PredicateSet implements PredicateInterface, Countable {
         }
         if (is_string($predicates)) {
             // String $predicate should be passed as an expression
-            $predicates = (strpos($predicates, Expression::PLACEHOLDER) !==
-                false) ? new Expression($predicates) : new Literal($predicates);
+            $predicates = str_contains($predicates, Expression::PLACEHOLDER) ? new Expression($predicates) : new Literal($predicates);
             $this->addPredicate($predicates, $combination);
             return $this;
         }
@@ -70,7 +69,7 @@ class PredicateSet implements PredicateInterface, Countable {
             foreach ($predicates as $pkey => $pvalue) {
                 // loop through predicates
                 if (is_string($pkey)) {
-                    if (strpos($pkey, '?') !== false) {
+                    if (str_contains($pkey, '?')) {
                         // First, process strings that the abstraction replacement character ?
                         // as an Expression predicate
                         $predicates = new Expression($pkey, $pvalue);
@@ -92,8 +91,7 @@ class PredicateSet implements PredicateInterface, Countable {
                     $predicates = $pvalue;
                 } else {
                     // must be an array of expressions (with int-indexed array)
-                    $predicates = (strpos($pvalue, Expression::PLACEHOLDER) !==
-                        false) ? new Expression($pvalue) : new Literal($pvalue);
+                    $predicates = str_contains($pvalue, Expression::PLACEHOLDER) ? new Expression($pvalue) : new Literal($pvalue);
                 }
                 $this->addPredicate($predicates, $combination);
             }

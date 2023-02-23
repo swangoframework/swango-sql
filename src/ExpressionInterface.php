@@ -1,9 +1,9 @@
 <?php
 namespace Sql;
 interface ExpressionInterface {
-    const TYPE_IDENTIFIER = 'identifier';
-    const TYPE_VALUE = 'value';
-    const TYPE_LITERAL = 'literal';
-    const TYPE_SELECT = 'select';
+    const TYPE_IDENTIFIER = ExpressionType::IDENTIFIER;
+    const TYPE_VALUE = ExpressionType::VALUE;
+    const TYPE_LITERAL = ExpressionType::LITERAL;
+    const TYPE_SELECT = ExpressionType::SELECT;
     public function getExpressionData(): array;
 }

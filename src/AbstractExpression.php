@@ -5,23 +5,17 @@ abstract class AbstractExpression implements ExpressionInterface {
      *
      * @var string[]
      */
-    protected array $allowedTypes = [
-        self::TYPE_IDENTIFIER,
-        self::TYPE_LITERAL,
-        self::TYPE_SELECT,
-        self::TYPE_VALUE
-    ];
     /**
      * Normalize Argument
      *
      * @param mixed $argument
-     * @param string $defaultType
+     * @param ExpressionType $defaultType
      *
      * @return array
      *
      * @throws Exception\InvalidArgumentException
      */
-    protected function normalizeArgument(mixed $argument, string $defaultType = self::TYPE_VALUE): array {
+    protected function normalizeArgument(mixed $argument, ExpressionType $defaultType = self::TYPE_VALUE): array {
         if ($argument instanceof ExpressionInterface || $argument instanceof SqlInterface) {
             return $this->buildNormalizedArgument($argument, self::TYPE_VALUE);
         }
@@ -39,7 +33,7 @@ abstract class AbstractExpression implements ExpressionInterface {
 
             $key = key($argument);
 
-            if (is_integer($key) && ! in_array($value, $this->allowedTypes)) {
+            if (is_integer($key) && ! $value instanceof ExpressionType) {
                 return $this->buildNormalizedArgument($value, $defaultType);
             }
 
@@ -55,8 +49,16 @@ abstract class AbstractExpression implements ExpressionInterface {
         }
 
         throw new Exception\InvalidArgumentException(sprintf('$argument should be %s or %s or %s or %s or %s or %s or %s, "%s" given',
-            'null', 'scalar', 'array', 'Sql\ExpressionInterface', 'Sql\Sql\SqlInterface', 'BackedEnum', 'Swango\Model\IdIndexedModel',
-            is_object($argument) ? get_class($argument) : gettype($argument)));
+            'null',
+            'scalar',
+            'array',
+            'Sql\ExpressionInterface',
+            'Sql\Sql\SqlInterface',
+            'BackedEnum',
+            'Swango\Model\IdIndexedModel',
+            is_object($argument) ? get_class($argument) : gettype($argument)
+        )
+        );
     }
     /**
      *
@@ -67,12 +69,7 @@ abstract class AbstractExpression implements ExpressionInterface {
      *
      * @throws Exception\InvalidArgumentException
      */
-    private function buildNormalizedArgument(mixed $argument, string $argumentType): array {
-        if (! in_array($argumentType, $this->allowedTypes)) {
-            throw new Exception\InvalidArgumentException(sprintf('Argument type should be in array(%s)',
-                implode(',', $this->allowedTypes)));
-        }
-
+    private function buildNormalizedArgument(mixed $argument, ExpressionType $argumentType): array {
         return [
             $argument,
             $argumentType

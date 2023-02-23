@@ -281,7 +281,7 @@ class Select extends AbstractSql {
      */
     public function order(string|array|Expression $order): self {
         if (is_string($order)) {
-            if (strpos($order, ',') !== false) {
+            if (str_contains($order, ',')) {
                 $order = preg_split('#,\s+#', $order);
             } else {
                 $order = (array)$order;
@@ -598,11 +598,8 @@ class Select extends AbstractSql {
                 continue;
             }
             if (is_int($k)) {
-                if (strpos($v, ' ') !== false) {
-                    [
-                        $k,
-                        $v
-                    ] = preg_split('# #', $v, 2);
+                if (str_contains($v, ' ')) {
+                    [$k, $v] = explode(' ', $v, 2);
                 } else {
                     $k = $v;
                     $v = self::ORDER_ASCENDING;

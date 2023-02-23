@@ -2,6 +2,7 @@
 namespace Sql\Predicate;
 use Sql\Exception;
 use Sql\AbstractExpression;
+use Sql\ExpressionType;
 
 class Operator extends AbstractExpression implements PredicateInterface {
     const OPERATOR_EQUAL_TO = '=';
@@ -21,14 +22,10 @@ class Operator extends AbstractExpression implements PredicateInterface {
      * {@inheritdoc}
      *
      */
-    protected array $allowedTypes = [
-        self::TYPE_IDENTIFIER,
-        self::TYPE_VALUE
-    ];
     protected mixed $left;
     protected mixed $right;
-    protected string $leftType = self::TYPE_IDENTIFIER;
-    protected string $rightType = self::TYPE_VALUE;
+    protected ExpressionType $leftType = self::TYPE_IDENTIFIER;
+    protected ExpressionType $rightType = self::TYPE_VALUE;
     protected string $operator = self::OPERATOR_EQUAL_TO;
     /**
      * Constructor
@@ -36,12 +33,16 @@ class Operator extends AbstractExpression implements PredicateInterface {
      * @param int|float|bool|string|\Sql\Expression $left
      * @param string $operator
      * @param int|float|bool|string|\Sql\Expression $right
-     * @param string $leftType
-     *            TYPE_IDENTIFIER or TYPE_VALUE by default TYPE_IDENTIFIER {@see allowedTypes}
-     * @param string $rightType
-     *            TYPE_IDENTIFIER or TYPE_VALUE by default TYPE_VALUE {@see allowedTypes}
+     * @param ExpressionType $leftType
+     *            TYPE_IDENTIFIER or TYPE_VALUE by default TYPE_IDENTIFIER
+     * @param ExpressionType $rightType
+     *            TYPE_IDENTIFIER or TYPE_VALUE by default TYPE_VALUE
      */
-    public function __construct(mixed $left = null, string $operator = self::OPERATOR_EQUAL_TO, mixed $right = null, string $leftType = self::TYPE_IDENTIFIER, string $rightType = self::TYPE_VALUE) {
+    public function __construct(mixed          $left = null,
+                                string         $operator = self::OPERATOR_EQUAL_TO,
+                                mixed          $right = null,
+                                ExpressionType $leftType = self::TYPE_IDENTIFIER,
+                                ExpressionType $rightType = self::TYPE_VALUE) {
         if ($left !== null) {
             $this->setLeft($left);
         }
@@ -91,16 +92,20 @@ class Operator extends AbstractExpression implements PredicateInterface {
      * Set parameter type for left side of operator
      *
      * @param string $type
-     *            TYPE_IDENTIFIER or TYPE_VALUE {@see allowedTypes}
+     *            TYPE_IDENTIFIER or TYPE_VALUE
      *
      * @return self Provides a fluent interface
      *
      * @throws Exception\InvalidArgumentException
      */
-    public function setLeftType(string $type): self {
-        if (! in_array($type, $this->allowedTypes)) {
+    public function setLeftType(ExpressionType $type): self {
+        if (! $type->isForOperator()) {
             throw new Exception\InvalidArgumentException(sprintf('Invalid type "%s" provided; must be of type "%s" or "%s"',
-                $type, __CLASS__ . '::TYPE_IDENTIFIER', __CLASS__ . '::TYPE_VALUE'));
+                $type,
+                __CLASS__ . '::TYPE_IDENTIFIER',
+                __CLASS__ . '::TYPE_VALUE'
+            )
+            );
         }
 
         $this->leftType = $type;
@@ -163,14 +168,18 @@ class Operator extends AbstractExpression implements PredicateInterface {
      * Set parameter type for right side of operator
      *
      * @param string $type
-     *            TYPE_IDENTIFIER or TYPE_VALUE {@see allowedTypes}
+     *            TYPE_IDENTIFIER or TYPE_VALUE
      * @return self Provides a fluent interface
      * @throws Exception\InvalidArgumentException
      */
-    public function setRightType(string $type): self {
-        if (! in_array($type, $this->allowedTypes)) {
+    public function setRightType(ExpressionType $type): self {
+        if (! $type->isForOperator()) {
             throw new Exception\InvalidArgumentException(sprintf('Invalid type "%s" provided; must be of type "%s" or "%s"',
-                $type, __CLASS__ . '::TYPE_IDENTIFIER', __CLASS__ . '::TYPE_VALUE'));
+                $type,
+                __CLASS__ . '::TYPE_IDENTIFIER',
+                __CLASS__ . '::TYPE_VALUE'
+            )
+            );
         }
 
         $this->rightType = $type;
@@ -191,8 +200,8 @@ class Operator extends AbstractExpression implements PredicateInterface {
      * @return array
      */
     public function getExpressionData(): array {
-        list($values[], $types[]) = $this->normalizeArgument($this->left, $this->leftType);
-        list($values[], $types[]) = $this->normalizeArgument($this->right, $this->rightType);
+        [$values[], $types[]] = $this->normalizeArgument($this->left, $this->leftType);
+        [$values[], $types[]] = $this->normalizeArgument($this->right, $this->rightType);
 
         return [
             [

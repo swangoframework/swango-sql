@@ -111,7 +111,7 @@ class Expression extends AbstractExpression {
         }
 
         foreach ($parameters as $parameter) {
-            list($values[], $types[]) = $this->normalizeArgument($parameter, self::TYPE_VALUE);
+            [$values[], $types[]] = $this->normalizeArgument($parameter, self::TYPE_VALUE);
         }
         return [
             [
