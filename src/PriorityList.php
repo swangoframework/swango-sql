@@ -183,17 +183,15 @@ class PriorityList implements \Iterator, \Countable {
      * {@inheritdoc}
      *
      */
-    public function next(): mixed {
-        $node = next($this->items);
-
-        return $node ? $node['data'] : false;
+    public function next(): void {
+        next($this->items);
     }
     /**
      *
      * {@inheritdoc}
      *
      */
-    public function valid(): mixed {
+    public function valid(): bool {
         return current($this->items) !== false;
     }
     /**

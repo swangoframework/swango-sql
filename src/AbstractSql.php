@@ -72,7 +72,7 @@ abstract class AbstractSql implements SqlInterface {
         $namedParameterPrefix = ! $namedParameterPrefix ? $namedParameterPrefix : $this->processInfo['paramPrefix'] .
             $namedParameterPrefix;
 
-        $namedParameterPrefix = preg_replace('/\s/', '__', $namedParameterPrefix);
+        $namedParameterPrefix = preg_replace('/\s/', '__', $namedParameterPrefix ?? '');
 
         $sql = '';
 
